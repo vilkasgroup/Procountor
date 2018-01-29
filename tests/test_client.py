@@ -33,20 +33,18 @@ class TestClient(unittest.TestCase):
     def test_get_users(self):
         """ Test getting user information from API """
         response = self.client.get_users()
-        print(response)
         self.assertIsNotNone(response)
 
     def test_send_one_time_pass(self):
         """ Test sending one time password for currently logged in user via SMS """
         response = self.client.send_one_time_pass()
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_user_profile(self):
         """ Test getting user profile based on user ID """
         userId = 1517286
         response = self.client.get_user_profile(userId)
-        print(response)
         self.assertIsNotNone(response)
 
     def test_get_products(self):
@@ -60,14 +58,14 @@ class TestClient(unittest.TestCase):
         }
 
         response = self.client.get_products()
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_product(self):
         """ Test getting info of one product """
         productId = 723460
         response = self.client.get_product(productId)
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_product_groups(self):
@@ -78,18 +76,18 @@ class TestClient(unittest.TestCase):
         }
 
         response = self.client.get_product_groups("PURCHASE")
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_vats(self):
         response = self.client.get_vats()
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_vats_country(self):
         data = {'countryCode':'FI'}
         response = self.client.get_vats_coutry('FI')
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_invoices(self):
@@ -103,21 +101,21 @@ class TestClient(unittest.TestCase):
         }
 
         response = self.client.get_invoices(0, **data)
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_invoice(self):
         response = self.client.get_invoice(8203037)
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_ledger_receipt(self):
         response = self.client.get_ledger_receipt(13786856)
-        print(response)
+
 
     def test_get_attachment(self):
         response = self.client.get_attachment(1528)
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_post_attachment(self):
@@ -129,12 +127,12 @@ class TestClient(unittest.TestCase):
 
         filename = "/Users/joonasmaliniemi/Desktop/test.txt"
         response = self.client.post_attachment(meta, filename)
-        print(response)
+
 
     def test_delete_attachment(self):
         attachmentId = 1486
         response = self.client.delete_attachment(attachmentId)
-        print(response)
+
 
     def test_post_invoice(self):
         data = {
@@ -175,12 +173,12 @@ class TestClient(unittest.TestCase):
         }
 
         response = self.client.post_invoice(**data)
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_currencies(self):
         response = self.client.get_currencies()
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_exchange_rate(self):
@@ -192,23 +190,23 @@ class TestClient(unittest.TestCase):
         }
 
         response = self.client.get_exchange_rate(**data)
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_latest_currency_rate(self):
         response = self.client.get_latest_currency_rate(1)
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_dimensions(self):
         response = self.client.get_dimensions()
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_dimension(self):
         dimensionId = 86160
         response = self.client.get_dimension(dimensionId)
-        print(response)
+
         self.assertIsNotNone(response)
 
     def test_get_bank_statements(self):
@@ -216,14 +214,14 @@ class TestClient(unittest.TestCase):
         endDate = "2018-01-23"
 
         response = self.client.get_bank_statements(startDate, endDate)
-        print(response)
+
 
     def test_delete_products_from_bank_statement(self):
         statementId = 1234
         eventId = 4321
 
         response = self.client.delete_products_from_bank_statement(statementId, eventId)
-        print(response)
+
 
 if __name__ == '__main__':
     unittest.main()
