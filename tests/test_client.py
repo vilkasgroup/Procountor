@@ -1,6 +1,6 @@
 import os
 import unittest
-from client import Client
+from procountor.client import Client
 
 class TestClient(unittest.TestCase):
     def __init__(self, *args, **kwargs):
