@@ -1,13 +1,11 @@
 import requests
-import os
 import json
-import base64
 from urllib.parse import urlparse, parse_qs
 import logging
 logging.basicConfig()
 logging.getLogger().setLevel(logging.DEBUG)
 requests_log = logging.getLogger("requests.packages.urllib3")
-requests_log.setLevel(logging.DEBUG)
+requests_log.setLevel(logging.INFO)
 requests_log.propagate = True
 
 
@@ -29,7 +27,8 @@ class Client():
     token_url = "https://api-test.procountor.com/api/oauth/token/"
     api_url = "https://api-test.procountor.com/api/"
 
-    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri, access_token, refresh_token):
+    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri, access_token,
+                 refresh_token):
         self.username = username
         self.password = password
         self.company_id = company_id
@@ -39,7 +38,6 @@ class Client():
         self.access_token = access_token
         self.refresh_token = refresh_token
 
-
     def invalidate_token(self):
 
         headers = {
@@ -47,68 +45,74 @@ class Client():
         }
 
         r = requests.post('https://api-test.procountor.com/logout', headers=headers)
+        if r.status_code == 401:
+            self.access_token = self.refresh_access_token(self.refresh_token)
+            r = requests.post('https://api-test.procountor.com/logout', headers=headers)
+            return r
+        elif r.status_code != 200:
+            r.raise_for_status()
 
-    # def get_auth_code(self):
-    #     """Makes post request and returns authorization code which is used for getting access token and refresh token
-    #
-    #     :return: auth_code
-    #     """
-    #
-    #     params = {
-    #         'response_type': 'code',
-    #         'username': self.username,
-    #         'password': self.password,
-    #         'company': self.company_id,
-    #         'redirect_uri': self.redirect_uri,
-    #     }
-    #
-    #     headers = {
-    #         'content-type': 'application/x-www-form-urlencoded'
-    #     }
-    #
-    #     r = requests.post(Client.auth_url + '?response_type=code&client_id=' + self.client_id + "&state=123456789", params=params, headers=headers)
-    #     if r.status_code != 401:
-    #         r.raise_for_status()
-    #
-    #     # have to get value of query parameter named 'code'
-    #     self.auth_code = parse_qs(urlparse(r.url).query)['code'][0]
-    #
-    #     return self.auth_code
-    #
-    #
-    # def get_tokens(self, auth_code):
-    #     """Makes a request and returns access token and refresh token for coming requests. Access token is valid for 3600 seconds and has to refresh after that with refresh token. Refresh token is valid always.
-    #
-    #     :return: granted tokens, dict
-    #     """
-    #
-    #     self.auth_code = auth_code
-    #
-    #     params = {
-    #         'grant_type': 'authorization_code',
-    #         'redirect_uri': self.redirect_uri,
-    #         'code': self.auth_code,
-    #         'client_id': self.client_id,
-    #         'client_secret': self.client_secret,
-    #     }
-    #
-    #     headers = {
-    #         'content-type': 'application/x-www-form-urlencoded'
-    #     }
-    #
-    #
-    #     r = requests.post(Client.token_url, params=params, headers=headers)
-    #     if r.status_code != 400:
-    #         r.raise_for_status()
-    #     for key, value in r.json().items():
-    #         if key == 'access_token':
-    #             self.access_token = value
-    #         if key == 'refresh_token':
-    #             self.refresh_token = value
-    #
-    #     tokens = {'access_token': self.access_token, 'refresh_token': self.refresh_token}
-    #     return tokens
+    def get_auth_code(self):
+        """Makes post request and returns authorization code which is used for getting access token and refresh token
 
+        :return: auth_code, string
+        """
+
+        params = {
+            'response_type': 'code',
+            'username': self.username,
+            'password': self.password,
+            'company': self.company_id,
+            'redirect_uri': self.redirect_uri,
+        }
+
+        headers = {
+            'content-type': 'application/x-www-form-urlencoded'
+        }
+
+        r = requests.post(Client.auth_url + '?response_type=code&client_id=' + self.client_id + "&state=123456789",
+                          params=params, headers=headers)
+
+        if r.status_code != 401:
+            r.raise_for_status()
+
+        # have to get value of query parameter named 'code'
+        self.auth_code = parse_qs(urlparse(r.url).query)['code'][0]
+
+        return self.auth_code
+
+    def get_tokens(self, auth_code):
+        """Makes a request and returns access token and refresh token for coming requests. Access token is valid for
+        3600 seconds and has to refresh after that with refresh token. Refresh token is valid always.
+
+        :return: granted tokens, dict
+        """
+
+        self.auth_code = auth_code
+
+        params = {
+            'grant_type': 'authorization_code',
+            'redirect_uri': self.redirect_uri,
+            'code': self.auth_code,
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+        }
+
+        headers = {
+            'content-type': 'application/x-www-form-urlencoded'
+        }
+
+        r = requests.post(Client.token_url, params=params, headers=headers)
+        if r.status_code != 400:
+            r.raise_for_status()
+        for key, value in r.json().items():
+            if key == 'access_token':
+                self.access_token = value
+            if key == 'refresh_token':
+                self.refresh_token = value
+
+        tokens = {'access_token': self.access_token, 'refresh_token': self.refresh_token}
+        return tokens
 
     def refresh_access_token(self, refresh_token):
         """If the access token is expired (3600 seconds), new access token is granted with refresh token
@@ -168,7 +172,8 @@ class Client():
 
     # PRODUCTS
     def get_products(self, **kwargs):
-        """Method gets and Returns a paginated list of products in the current environment, starting from "previousId" limited by "limit". Takes optional query parameters.
+        """Method gets and Returns a paginated list of products in the current environment, starting from "previousId"
+        limited by "limit". Takes optional query parameters.
 
         :param previousId: previous invoice id for pagination, integer, optional
         :param limit: maximum number of results, defaults to 50, integer, optional
@@ -186,7 +191,7 @@ class Client():
             for key, value in kwargs.items():
                 index += 1
                 if index < len(kwargs):
-                    endpoint += "{}={}&".format(str(value))
+                    endpoint += "{}={}&".format(key, str(value))
                 else:
                     endpoint += "{}={}".format(key, str(value))
 
@@ -228,7 +233,7 @@ class Client():
 
         return self.request(method, endpoint)
 
-    def get_vats_coutry(self, countryCode):
+    def get_vats_country(self, countryCode):
         """Method gets and returns VAT percentages available for the given country
 
         :param countryCode: ISO 3166-1 alpha-2 format, string
@@ -242,9 +247,13 @@ class Client():
 
     # INVOICES
     def get_invoices(self, previousId, **kwargs):
-        """Method searches invoices. Returns a list containing basic information for the invoices. The ID in each result entry can be used to fetch complete invoice details with the GET /invoices/{invoiceId} endpoint, get_invoice() method. Supports purchase, sales, self-assessed tax, travel and expense (bill of charges) invoices.
+        """Method searches invoices. Returns a list containing basic information for the invoices. The ID in each
+        result entry can be used to fetch complete invoice details with the GET /invoices/{invoiceId} endpoint,
+        get_invoice() method. Supports purchase, sales, self-assessed tax, travel and expense (bill of charges)
+        invoices.
 
-        NOTE: Maximum invoices to fetch in one request is 50, so the 50th invoice's ID must be used as previousId if more pages are fetched. For the first fetch 0 as a previousId value is ok.
+        NOTE: Maximum invoices to fetch in one request is 50, so the 50th invoice's ID must be used as previousId if
+        more pages are fetched. For the first fetch 0 as a previousId value is ok.
 
         :param previousId: previous invoice ID for pagination (max pagesize is 50), string
         :param status: invoice status, string, optional
@@ -271,7 +280,8 @@ class Client():
         return self.request(method, endpoint)
 
     def get_invoice(self, invoiceId):
-        """Method gets and returns the requested invoice. Supports expense (bill of charges), purchase, sales,self-assessed tax and travel invoices.
+        """Method gets and returns the requested invoice. Supports expense (bill of charges), purchase,
+        sales,self-assessed tax and travel invoices.
 
         :param invoiceId: ID of the invoice, integer
         """
@@ -296,7 +306,8 @@ class Client():
         return self.request(method, endpoint, **kwargs)
 
     def approve_invoice(self, invoiceId, **kwargs):
-        """Method approves invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure invoice circulation settings in the Procountor environment before using this.
+        """Method approves invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure
+        invoice circulation settings in the Procountor environment before using this.
 
         :param invoiceId: ID of the invoice, integer
         :param comment: Comment for approval event. Max length 255, string in dict, optional
@@ -308,7 +319,9 @@ class Client():
         return self.request(method, endpoint, **kwargs)
 
     def send_invoice_to_circulation(self, invoiceId):
-        """Method sends requested invoice to circulation. Supports travel and expense invoices. Invoice circulation needs to be configured and enabled in Procountor settings. Marks invoice status as 'RECEIVED' when it is in 'UNFINISHED' status.
+        """Method sends requested invoice to circulation. Supports travel and expense invoices. Invoice circulation
+        needs to be configured and enabled in Procountor settings. Marks invoice status as 'RECEIVED' when it is in
+        'UNFINISHED' status.
 
         :param invoiceId: ID of the invoice, integer
         """
@@ -319,7 +332,8 @@ class Client():
         return self.request(method, endpoint)
 
     def verify_invoice(self, invoiceId, **kwargs):
-        """Method verifies invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure invoice circulation settings in the Procountor environment before using this.
+        """Method verifies invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure
+        invoice circulation settings in the Procountor environment before using this.
 
         :param invoiceId: ID of the invoice, integer
         :param comment: Comment for verification event. Max length 255, string in dict, optional
@@ -331,7 +345,10 @@ class Client():
         return self.request(method, endpoint, **kwargs)
 
     def pay_invoice(self, **kwargs):
-        """Method to pay invoices in Procountor. Supports purchase invoices and self-assessed tax invoices. All of the invoices have to be valid in order to pay. If paying one of the invoices fails, none of the invoices will be paid. A valid one time password must be supplied. To receive one time password, use send_one_time_pass() method. The default bank account of the environment is used for the payment.
+        """Method to pay invoices in Procountor. Supports purchase invoices and self-assessed tax invoices. All of the
+        invoices have to be valid in order to pay. If paying one of the invoices fails, none of the invoices will be
+        paid. A valid one time password must be supplied. To receive one time password, use send_one_time_pass()
+        method. The default bank account of the environment is used for the payment.
 
         :param paymentData: list of payment details, list
         :param oneTimePassword: one time password (OTP) for current user, string
@@ -371,7 +388,9 @@ class Client():
         :param baseCurrency: base currency for conversion, string
         :param currency: target currency for conversion, string
         :param day: day for the rate (yyyy-MM-dd), string
-        :param rateType: type of the rate, string, possible values: 'PROCOUNTOR_ACCOUNTING_EXCHANGE_RATE', 'ACCOUNT_CURRENCY_AVERAGE_RATE', 'ACCOUNT_CURRENCY_BUYING_RATE', 'ACCOUNT_CURRENCY_SELLING_RATE', 'CASH_BUYING_RATE', 'CASH_CURRENCY_SALE_EXCHANGE_RATE'
+        :param rateType: type of the rate, string, possible values: 'PROCOUNTOR_ACCOUNTING_EXCHANGE_RATE',
+        'ACCOUNT_CURRENCY_AVERAGE_RATE', 'ACCOUNT_CURRENCY_BUYING_RATE', 'ACCOUNT_CURRENCY_SELLING_RATE',
+        'CASH_BUYING_RATE', 'CASH_CURRENCY_SALE_EXCHANGE_RATE'
         :return: exchange rate for the given currency, dict
         """
 
@@ -395,7 +414,8 @@ class Client():
     def get_latest_currency_rate(self, rateType):
         """Gets and returns list of currency rates for the company base currency
 
-        :param rateType: requested rate type, integer, values: 1 - Procountor Accounting Exchange Rate, 2 - Average Rate, 3 - Buy Rate, 4 - Sell Rate, 5 - Cash Buy Rate, 6 - Cash sale exchange rate
+        :param rateType: requested rate type, integer, values: 1 - Procountor Accounting Exchange Rate, 2 - Average
+        Rate, 3 - Buy Rate, 4 - Sell Rate, 5 - Cash Buy Rate, 6 - Cash sale exchange rate
         :return: list of currency rates for base currency, dict
         """
 
@@ -406,7 +426,8 @@ class Client():
 
     # DIMENSIONS
     def get_dimensions(self):
-        """Gets and returns a list of all dimensions and dimension items for the current company. Dimensios can be set on the Dimensions page in Procountor.
+        """Gets and returns a list of all dimensions and dimension items for the current company. Dimensios can be set
+        on the Dimensions page in Procountor.
 
         :return: list of all dimensions and dimension items for the current company, dict
         """
@@ -430,7 +451,8 @@ class Client():
 
     # FISCAL YEARS
     def get_fiscal_years(self):
-        """Gets and returns fiscal years ordered by their start date, from newest to oldest. Tracking periods, if exist, are in chronological order. Fiscal years can be edited on the Fiscal years page in Procountor.
+        """Gets and returns fiscal years ordered by their start date, from newest to oldest. Tracking periods, if
+        exist, are in chronological order. Fiscal years can be edited on the Fiscal years page in Procountor.
 
         :return: list of fiscal years, dict
         """
@@ -442,12 +464,16 @@ class Client():
 
     # LEDGER RECEIPTS
     def get_ledger_receipts(self, previousId, **kwargs):
-        """Method gets and returns a list containing basic information for the receipts. The receiptID in each result entry can be used to fetch complete receipt details with the GET /ledgerereceipts/{receiptId} endpoint, get_ledger_receipt() method. Supported ledger receipt types are journals, sales invoice ledger receipts and purchase ledger invoice receipts.
+        """Method gets and returns a list containing basic information for the receipts. The receiptID in each result
+        entry can be used to fetch complete receipt details with the GET /ledgerereceipts/{receiptId} endpoint,
+        get_ledger_receipt() method. Supported ledger receipt types are journals, sales invoice ledger receipts and
+        purchase ledger invoice receipts.
 
         :param previousId: previous ledger receipt ID for pagination, string
         :param startDate: start date of the search (yyyy-MM-dd), string
         :param endDate: end date of the search (yyyy-MM-dd), string
-        :param types: ledger receipt types, list of strings, possible values: 'JOURNAL', 'PURCHASE_INVOICE', 'SALES_INVOICE', 'PERIODIC_TAX_RETURN'
+        :param types: ledger receipt types, list of strings, possible values: 'JOURNAL', 'PURCHASE_INVOICE',
+        'SALES_INVOICE', 'PERIODIC_TAX_RETURN'
         :param orderById: order the results by ledger receipt ID ('asc' or 'desc'), string
         :return: list containing basic information for the receipts, dict
         """
@@ -470,7 +496,8 @@ class Client():
         return self.request(method, endpoint)
 
     def get_ledger_receipt(self, receiptId):
-        """Method gets and returns the requested ledger receipt. Supported ledger receipt types are journals, sales invoice ledger receipts and purchase invoice ledger receipts
+        """Method gets and returns the requested ledger receipt. Supported ledger receipt types are journals, sales
+        invoice ledger receipts and purchase invoice ledger receipts
 
         :param receiptId: ledger receipt identifier, integer
         :return: requested ledger receipt, dict
@@ -496,7 +523,9 @@ class Client():
         return self.request(method, endpoint, **kwargs)
 
     def update_ledger_receipt(self, receiptId, **kwargs):
-        """Method updates requested ledger receipt in Procountor environment. Supported ledger receipt types are journals, sales invoice ledger receipts and purchase invoice ledger receipts. For defining the ledger accounts, dimensions, VAT status or other accounting information for an invoice, use this method.
+        """Method updates requested ledger receipt in Procountor environment. Supported ledger receipt types are
+        journals, sales invoice ledger receipts and purchase invoice ledger receipts. For defining the ledger accounts,
+        dimensions, VAT status or other accounting information for an invoice, use this method.
 
         :param receiptId: ledger receipt identifier, integer
         :param kwargs: ledger receipt data, dict
@@ -512,7 +541,8 @@ class Client():
 
     # CHART OF ACCOUNTS
     def get_coa(self):
-        """Method gets and returns the chart of accounts for the current environment. It can be modified on the Chart of accounts page in Procountor.
+        """Method gets and returns the chart of accounts for the current environment. It can be modified on the Chart
+        of accounts page in Procountor.
 
         :return: chart of accounts for the current environment, dict
         """
@@ -537,7 +567,9 @@ class Client():
 
     # BANK STATEMENTS
     def get_bank_statements(self, startDate, endDate):
-        """Gets and returns all bank statements that match the request criteria. Each BankStatementEvent can have a list of child events. In that case, the event model contains an additional "event" property with an array of BankStatementEvents as its value.
+        """Gets and returns all bank statements that match the request criteria. Each BankStatementEvent can have a
+        list of child events. In that case, the event model contains an additional "event" property with an array of
+        BankStatementEvents as its value.
 
         :param startDate: Start date of the search (yyyy-MM-dd), string
         :param endDate: End date of the search (yyyy-MM-dd), string
@@ -573,10 +605,11 @@ class Client():
         endpoint = "bankstatements/{}/events/{}/products".format(str(statementId), str(eventId))
 
         return self.request(method, endpoint, **kwargs)
-        
+
     # ATTACHMENTS
     def get_attachment(self, attachmentId):
-        """Gets and returns an attachment based on given attachment ID. Both attachment metadata (application/json) and the file itself will be returned. Content-type for the response is multipart/mixed.
+        """Gets and returns an attachment based on given attachment ID. Both attachment metadata (application/json) and
+        the file itself will be returned. Content-type for the response is multipart/mixed.
 
         :param attachmentId: ID of the requested attachment, integer
         :return: attachment metadata (dict) and file itself
@@ -597,9 +630,11 @@ class Client():
         return self.request(method, endpoint)
 
     def post_attachment(self, meta, filename):
-        """Method sends new attachment to Procountor. The attachment can be of any type but limited to max 10000000 bytes (10MB). Content-type for the request is multipart/form-data. Type for the meta data is application/json.
+        """Method sends new attachment to Procountor. The attachment can be of any type but limited to max 10000000
+        bytes (10MB). Content-type for the request is multipart/form-data. Type for the meta data is application/json.
 
-        :param meta: meta data for attachment, contains name of the file, referenceType and referenceId of the attachment, dict
+        :param meta: meta data for attachment, contains name of the file, referenceType and referenceId of the
+        attachment, dict
         :param filename: path to the file
         """
         method = "POST"
@@ -614,10 +649,11 @@ class Client():
             r = requests.request(method, self.api_url + endpoint, files=files, headers=self.headers(method, endpoint))
             if r.status_code == 401:
                 self.access_token = self.refresh_access_token(self.refresh_token)
-                r = requests.request(method, self.api_url + endpoint, files=files, headers=self.headers(method, endpoint))
-                return r.text
+                r = requests.request(method, self.api_url + endpoint, files=files,
+                                     headers=self.headers(method, endpoint))
+                return json.loads(r.content)
             else:
-                return r.text
+                return json.loads(r.content)
 
     def request(self, method, endpoint, *args, **kwargs):
         """Method to make HTTP requests over Procountor REST API
@@ -653,7 +689,8 @@ class Client():
                 }
             elif method == "POST":
                 headers = {
-                    # can't put 'content-type': 'multipart/form-data' here as documentation says. Requests generates it automatically.
+                    # can't put 'content-type': 'multipart/form-data' here as documentation says. Requests generates it
+                    # automatically.
                     'authorization': 'Bearer {}'.format(self.access_token),
                 }
             else:

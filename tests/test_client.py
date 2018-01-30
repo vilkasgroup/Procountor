@@ -1,5 +1,6 @@
 import os
 import unittest
+import datetime
 from procountor.client import Client
 
 class TestClient(unittest.TestCase):
@@ -29,78 +30,85 @@ class TestClient(unittest.TestCase):
         self.assertIsNotNone(self.client.client_secret)
         self.assertIsNotNone(self.client.redirect_uri)
 
+    def test_refresh_access_token(self):
+        response = self.client.refresh_access_token(self.client.refresh_token)
+        self.assertIsNotNone(response)
 
     def test_get_users(self):
         """ Test getting user information from API """
         response = self.client.get_users()
         self.assertIsNotNone(response)
+        print(response)
 
     def test_send_one_time_pass(self):
         """ Test sending one time password for currently logged in user via SMS """
         response = self.client.send_one_time_pass()
-
         self.assertIsNotNone(response)
 
-    def test_get_user_profile(self):
-        """ Test getting user profile based on user ID """
-        userId = 1517286
-        response = self.client.get_user_profile(userId)
-        self.assertIsNotNone(response)
+    # def test_get_user_profile(self):
+    #     """ Test getting user profile based on user ID """
+    #     userId = 14438
+    #     response = self.client.get_user_profile(userId)
+    #     self.assertIsNotNone(response)
 
     def test_get_products(self):
-        """ Test getting all products from API """
+        """ get all products from API """
+
+        response_all = self.client.get_products()
+        self.assertIsNotNone(response_all)
+
+        """ get products with limit """
 
         data = {
             "previousId": "",
-            "limit": "",
+            "limit": "2",
             "group": "",
             "type": "PURCHASE"
         }
 
-        response = self.client.get_products()
-
-        self.assertIsNotNone(response)
+        response_limit = self.client.get_products(**data)
+        self.assertIsNotNone(response_limit)
 
     def test_get_product(self):
-        """ Test getting info of one product """
+        """ get info of one product """
         productId = 723460
         response = self.client.get_product(productId)
 
         self.assertIsNotNone(response)
 
     def test_get_product_groups(self):
-        """ Test getting product groups (by product type) """
+        """ get product groups (by product type) """
 
         data = {
             "productType": "PURCHASE",
         }
 
         response = self.client.get_product_groups("PURCHASE")
-
         self.assertIsNotNone(response)
 
     def test_get_vats(self):
+        """ get VAT percentages for the current company """
         response = self.client.get_vats()
 
         self.assertIsNotNone(response)
 
     def test_get_vats_country(self):
-        data = {'countryCode':'FI'}
-        response = self.client.get_vats_coutry('FI')
+        """ get VAT percentages available for the given country """
+        response = self.client.get_vats_country('FI')
 
         self.assertIsNotNone(response)
 
     def test_get_invoices(self):
-        data = {
-            "status": "",
-            "startDate": "",
-            "endDate": "",
-            "types":"PURCHASE_INVOICE,SALES_INVOICE",
-            "orderById": "asc",
-            #"orderByDate": ""
-        }
+        # data = {
+        #     "status": "",
+        #     "startDate": "",
+        #     "endDate": "",
+        #     "types":"",
+        #     #"orderById": "asc",
+        #     "orderByDate": ""
+        # }
 
-        response = self.client.get_invoices(0, **data)
+        response = self.client.get_invoices(0)
 
         self.assertIsNotNone(response)
 
@@ -109,48 +117,25 @@ class TestClient(unittest.TestCase):
 
         self.assertIsNotNone(response)
 
-    def test_get_ledger_receipt(self):
-        response = self.client.get_ledger_receipt(13786856)
-
-
-    def test_get_attachment(self):
-        response = self.client.get_attachment(1528)
-
-        self.assertIsNotNone(response)
-
-    def test_post_attachment(self):
-        meta = {
-            "name": "test.txt",
-            "referenceType": "INVOICE",
-            "referenceId": 8197608,
-        }
-
-        filename = "/Users/joonasmaliniemi/Desktop/test.txt"
-        response = self.client.post_attachment(meta, filename)
-
-
-    def test_delete_attachment(self):
-        attachmentId = 1486
-        response = self.client.delete_attachment(attachmentId)
-
-
     def test_post_invoice(self):
+        date = str(datetime.date.today())
+        dueDate = str(datetime.date.today() + datetime.timedelta(weeks=2))
         data = {
             "type": "SALES_INVOICE",
             "status": "UNFINISHED",
-            "date": "2017-01-22",
+            "date": date,
             "counterParty": {
                 "counterPartyAddress": {
-                    "name": "Testi Mies 2"
+                    "name": "Testi Mies"
                 }
             },
             "paymentInfo": {
                 "paymentMethod": "BANK_TRANSFER",
                 "currency": "EUR",
-                "dueDate": "2018-01-17",
+                "dueDate": dueDate,
                 "currencyRate": 1,
                 "bankAccount": {
-                    "accountNumber" : os.environ['PROCOUNTOR_TEST_IBAN']
+                    "accountNumber": "FI7276549406033672",
                 }
             },
             "extraInfo": {
@@ -175,6 +160,18 @@ class TestClient(unittest.TestCase):
         response = self.client.post_invoice(**data)
 
         self.assertIsNotNone(response)
+
+    def test_approve_invoice(self):
+        pass
+
+    def test_send_invoice_to_circulation(self):
+        pass
+
+    def test_verify_invoice(self):
+        pass
+
+    def test_pay_invoice(self):
+        pass
 
     def test_get_currencies(self):
         response = self.client.get_currencies()
@@ -209,18 +206,70 @@ class TestClient(unittest.TestCase):
 
         self.assertIsNotNone(response)
 
+    def test_get_fiscal_years(self):
+        response = self.client.get_fiscal_years()
+        self.assertIsNotNone(response)
+
+    def test_get_ledger_receipts(self):
+        response = self.client.get_ledger_receipts(0)
+        self.assertIsNotNone(response)
+
+    def test_get_ledger_receipt(self):
+        response = self.client.get_ledger_receipt(13786856)
+        self.assertIsNotNone(response)
+
+    def test_update_ledger_receipt(self):
+        pass
+
+    def test_get_coa(self):
+        response = self.client.get_coa()
+        self.assertIsNotNone(response)
+
+    def test_get_business_partner(self):
+        pass
+
     def test_get_bank_statements(self):
-        startDate = "2017-12-01"
-        endDate = "2018-01-23"
-
-        response = self.client.get_bank_statements(startDate, endDate)
-
+        # startDate = "2017-12-01"
+        # endDate = "2018-01-23"
+        #
+        # response = self.client.get_bank_statements(startDate, endDate)
+        pass
 
     def test_delete_products_from_bank_statement(self):
-        statementId = 1234
-        eventId = 4321
+        # statementId = 1234
+        # eventId = 4321
+        #
+        # response = self.client.delete_products_from_bank_statement(statementId, eventId)
+        pass
 
-        response = self.client.delete_products_from_bank_statement(statementId, eventId)
+    def test_put_products_to_bank_statement(self):
+        pass
+
+    def test_get_attachment(self):
+        response = self.client.get_attachment(1528)
+
+        self.assertIsNotNone(response)
+
+    def test_post_attachment(self):
+        meta = {
+            "name": "test.txt",
+            "referenceType": "INVOICE",
+            "referenceId": 8197608,
+        }
+
+        filename = "/Users/joonasmaliniemi/Desktop/test.txt"
+        response = self.client.post_attachment(meta, filename)
+        self.assertIsNotNone(response)
+        attachmentId = response['id']
+        responseDelete = self.client.delete_attachment(attachmentId)
+        self.assertIsNotNone(responseDelete)
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
