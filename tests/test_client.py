@@ -250,27 +250,19 @@ class TestClient(unittest.TestCase):
 
         self.assertIsNotNone(response)
 
-    def test_post_attachment(self):
-        meta = {
-            "name": "test.txt",
-            "referenceType": "INVOICE",
-            "referenceId": 8197608,
-        }
-
-        filename = "/Users/joonasmaliniemi/Desktop/test.txt"
-        response = self.client.post_attachment(meta, filename)
-        self.assertIsNotNone(response)
-        attachmentId = response['id']
-        responseDelete = self.client.delete_attachment(attachmentId)
-        self.assertIsNotNone(responseDelete)
-
-
-
-
-
-
-
-
-
+    # def test_post_attachment(self):
+    #     meta = {
+    #         "name": "test.txt",
+    #         "referenceType": "INVOICE",
+    #         "referenceId": 8197608,
+    #     }
+    #
+    #     filename = "/Users/joonasmaliniemi/Desktop/test.txt"
+    #     response = self.client.post_attachment(meta, filename)
+    #     self.assertIsNotNone(response)
+    #     attachmentId = response['id']
+    #     responseDelete = self.client.delete_attachment(attachmentId)
+    #     self.assertIsNotNone(responseDelete)
+    
 if __name__ == '__main__':
     unittest.main()
