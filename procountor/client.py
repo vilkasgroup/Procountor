@@ -42,6 +42,7 @@ class Client():
         self.refresh_token = refresh_token
 
     def invalidate_token(self):
+        """Method invalidates the access token"""
 
         headers = {
             'authorization': 'Bearer ' + self.access_token
@@ -392,8 +393,8 @@ class Client():
         :param currency: target currency for conversion, string
         :param day: day for the rate (yyyy-MM-dd), string
         :param rateType: type of the rate, string, possible values: 'PROCOUNTOR_ACCOUNTING_EXCHANGE_RATE',
-        'ACCOUNT_CURRENCY_AVERAGE_RATE', 'ACCOUNT_CURRENCY_BUYING_RATE', 'ACCOUNT_CURRENCY_SELLING_RATE',
-        'CASH_BUYING_RATE', 'CASH_CURRENCY_SALE_EXCHANGE_RATE'
+                         'ACCOUNT_CURRENCY_AVERAGE_RATE', 'ACCOUNT_CURRENCY_BUYING_RATE',
+                         'ACCOUNT_CURRENCY_SELLING_RATE', 'CASH_BUYING_RATE', 'CASH_CURRENCY_SALE_EXCHANGE_RATE'
         :return: exchange rate for the given currency, dict
         """
 
@@ -418,7 +419,7 @@ class Client():
         """Gets and returns list of currency rates for the company base currency
 
         :param rateType: requested rate type, integer, values: 1 - Procountor Accounting Exchange Rate, 2 - Average
-        Rate, 3 - Buy Rate, 4 - Sell Rate, 5 - Cash Buy Rate, 6 - Cash sale exchange rate
+                         Rate, 3 - Buy Rate, 4 - Sell Rate, 5 - Cash Buy Rate, 6 - Cash sale exchange rate
         :return: list of currency rates for base currency, dict
         """
 
@@ -476,7 +477,7 @@ class Client():
         :param startDate: start date of the search (yyyy-MM-dd), string
         :param endDate: end date of the search (yyyy-MM-dd), string
         :param types: ledger receipt types, list of strings, possible values: 'JOURNAL', 'PURCHASE_INVOICE',
-        'SALES_INVOICE', 'PERIODIC_TAX_RETURN'
+                      'SALES_INVOICE', 'PERIODIC_TAX_RETURN'
         :param orderById: order the results by ledger receipt ID ('asc' or 'desc'), string
         :return: list containing basic information for the receipts, dict
         """
@@ -637,7 +638,7 @@ class Client():
         bytes (10MB). Content-type for the request is multipart/form-data. Type for the meta data is application/json.
 
         :param meta: meta data for attachment, contains name of the file, referenceType and referenceId of the
-        attachment, dict
+                     attachment, dict
         :param filename: path to the file
         """
         method = "POST"
