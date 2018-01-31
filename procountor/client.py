@@ -1,6 +1,9 @@
 import requests
 import json
-from urllib.parse import urlparse, parse_qs
+try:
+    from urllib.parse import urlparse, parse_qs
+except ImportError:
+    from urlparse import urlparse, parse_qs
 import logging
 logging.basicConfig()
 logging.getLogger().setLevel(logging.DEBUG)
