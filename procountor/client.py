@@ -4,13 +4,6 @@ try:
     from urllib.parse import urlparse, parse_qs
 except ImportError:
     from urlparse import urlparse, parse_qs
-import logging
-logging.basicConfig()
-logging.getLogger().setLevel(logging.DEBUG)
-requests_log = logging.getLogger("requests.packages.urllib3")
-requests_log.setLevel(logging.INFO)
-requests_log.propagate = True
-
 
 class Client():
     """Class for Procountor accounting API
