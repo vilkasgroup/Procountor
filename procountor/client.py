@@ -5,6 +5,7 @@ try:
 except ImportError:
     from urlparse import urlparse, parse_qs
 
+
 class Client():
     """Class for Procountor accounting API
 
