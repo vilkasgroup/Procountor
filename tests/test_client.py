@@ -40,10 +40,10 @@ class TestClient(unittest.TestCase):
         self.assertIsNotNone(response)
         print(response)
 
-    def test_send_one_time_pass(self):
-        """ Test sending one time password for currently logged in user via SMS """
-        response = self.client.send_one_time_pass()
-        self.assertIsNotNone(response)
+    # def test_send_one_time_pass(self):
+    #     """ Test sending one time password for currently logged in user via SMS """
+    #     response = self.client.send_one_time_pass()
+    #     self.assertIsNotNone(response)
 
     # def test_get_user_profile(self):
     #     """ Test getting user profile based on user ID """
@@ -103,7 +103,7 @@ class TestClient(unittest.TestCase):
         #     "status": "",
         #     "startDate": "",
         #     "endDate": "",
-        #     "types":"",
+        #     "types":"TRAVEL_INVOICE",
         #     #"orderById": "asc",
         #     "orderByDate": ""
         # }
@@ -116,56 +116,61 @@ class TestClient(unittest.TestCase):
         response = self.client.get_invoice(8203037)
 
         self.assertIsNotNone(response)
+        #print(response)
 
-    def test_post_invoice(self):
-        date = str(datetime.date.today())
-        dueDate = str(datetime.date.today() + datetime.timedelta(weeks=2))
-        data = {
-            "type": "SALES_INVOICE",
-            "status": "UNFINISHED",
-            "date": date,
-            "counterParty": {
-                "counterPartyAddress": {
-                    "name": "Testi Mies"
-                }
-            },
-            "paymentInfo": {
-                "paymentMethod": "BANK_TRANSFER",
-                "currency": "EUR",
-                "dueDate": dueDate,
-                "currencyRate": 1,
-                "bankAccount": {
-                    "accountNumber": "FI7276549406033672",
-                }
-            },
-            "extraInfo": {
-                "accountingByRow": False,
-                "unitPricesIncludeVat": False
-            },
-            "discountPercent": 0,
-            "invoiceRows": [
-                {
-                    "product": "Purkki",
-                    "quantity": 1,
-                    "unit": "PIECE",
-                    "unitPrice": 2.50,
-                    "discountPercent" : 10,
-                    "vatPercent": 24
-                }
-            ],
-            "invoiceChannel": "NO_SENDING",
-            "language" : "FINNISH"
-        }
-
-        response = self.client.post_invoice(**data)
-
-        self.assertIsNotNone(response)
+    # def test_post_invoice(self):
+    #     date = str(datetime.date.today())
+    #     dueDate = str(datetime.date.today() + datetime.timedelta(weeks=2))
+    #     data = {
+    #         "type": "TRAVEL_INVOICE",
+    #         "status": "UNFINISHED",
+    #         "date": date,
+    #         "counterParty": {
+    #             "counterPartyAddress": {
+    #                 "name": "Testi Mies"
+    #             }
+    #         },
+    #         "paymentInfo": {
+    #             "paymentMethod": "BANK_TRANSFER",
+    #             "currency": "EUR",
+    #             "dueDate": dueDate,
+    #             "currencyRate": 1,
+    #             "bankAccount": {
+    #                 "accountNumber": "FI7276549406033672",
+    #             }
+    #         },
+    #         "extraInfo": {
+    #             "accountingByRow": False,
+    #             "unitPricesIncludeVat": False
+    #         },
+    #         "discountPercent": 0,
+    #         "invoiceRows": [
+    #             {
+    #                 "product": "Purkki",
+    #                 "quantity": 1,
+    #                 "unit": "PIECE",
+    #                 "unitPrice": 2.50,
+    #                 "discountPercent" : 10,
+    #                 "vatPercent": 24
+    #             }
+    #         ],
+    #         "invoiceChannel": "NO_SENDING",
+    #         "language" : "FINNISH"
+    #     }
+    #
+    #     response = self.client.post_invoice(**data)
+    #
+    #     self.assertIsNotNone(response)
 
     def test_approve_invoice(self):
         pass
 
     def test_send_invoice_to_circulation(self):
-        pass
+        invoiceId = 8203716
+        response = self.client.send_invoice_to_circulation(invoiceId)
+        self.assertIsNotNone(response)
+        print(response)
+
 
     def test_verify_invoice(self):
         pass
@@ -263,6 +268,6 @@ class TestClient(unittest.TestCase):
     #     attachmentId = response['id']
     #     responseDelete = self.client.delete_attachment(attachmentId)
     #     self.assertIsNotNone(responseDelete)
-    
+
 if __name__ == '__main__':
     unittest.main()
