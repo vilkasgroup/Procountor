@@ -563,6 +563,18 @@ class Client():
 
         return self.request(method, endpoint)
 
+    def get_business_partner_details(self):
+        """Method gets and returns basic information on person register entry for currently logged in user.
+        Includes eg. name, address and payment information
+
+        :return:
+        """
+
+        method = "GET"
+        endpoint = "businesspartners/personaldetails"
+
+        return self.request(method, endpoint)
+
     # BANK STATEMENTS
     def get_bank_statements(self, startDate, endDate):
         """Gets and returns all bank statements that match the request criteria. Each BankStatementEvent can have a
@@ -666,10 +678,21 @@ class Client():
         if r.status_code == 401:
             self.access_token = self.refresh_access_token(self.refresh_token)
             r = requests.request(method, self.api_url + endpoint, headers=self.headers(method, endpoint), json=kwargs)
-            r.raise_for_status()
-            return r.text
+            # r.raise_for_status()
+
+            if method == "GET" and "attachments" in endpoint:
+                return r.content
+            elif method == "PUT":
+                return r.status_code
+            else:
+                return r.text
         else:
-            return r.text
+            if method == "GET" and "attachments" in endpoint:
+                return r.content
+            elif method == "PUT":
+                return r.status_code
+            else:
+                return r.text
 
     def headers(self, method, endpoint):
         """Method returns correct headers for request.
