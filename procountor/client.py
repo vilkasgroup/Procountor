@@ -731,9 +731,12 @@ class Client():
         if r.status_code == 401:
             self.access_token = self.refresh_access_token(self.refresh_token)
             r = requests.request(method, self.api_url + endpoint, headers=self.headers(method, endpoint), json=kwargs)
-            r.raise_for_status()
+            if r.status_code != 429:
+                r.raise_for_status()
             return r
         else:
+            if r.status_code != 429:
+                r.raise_for_status()
             return r
 
     def headers(self, method, endpoint):
