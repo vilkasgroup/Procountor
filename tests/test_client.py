@@ -1,6 +1,8 @@
 import os
 import unittest
 import datetime
+import json
+from time import sleep
 from procountor.client import Client
 
 class TestClient(unittest.TestCase):
@@ -37,91 +39,97 @@ class TestClient(unittest.TestCase):
     def test_get_users(self):
         """ Test getting user information from API """
         response = self.client.get_users()
-        self.assertIsNotNone(response)
-        print(response)
+        self.assertEqual(response[0], 200)
 
-    def test_send_one_time_pass(self):
-        """ Test sending one time password for currently logged in user via SMS """
-        response = self.client.send_one_time_pass()
-        self.assertIsNotNone(response)
+    # def test_send_one_time_pass(self):
+    #     """ Test sending one time password for currently logged in user via SMS """
+    #     response = self.client.send_one_time_pass()
+    #     # After the first test status code is 429 as explained below
+    #     self.assertEqual(response, 200)
+    #     # We need to wait for 10 minutes before we can send another one time password (otp), if the otp is not used.
+    #     # If this test is included in tests to run, it takes about 40 mins to complete. So comment this test if you
+    #     # don't want to wait that long.
+    #     # sleep(600)
 
-    # def test_get_user_profile(self):
-    #     """ Test getting user profile based on user ID """
-    #     userId = 14438
-    #     response = self.client.get_user_profile(userId)
-    #     self.assertIsNotNone(response)
+    def test_get_user_profile(self):
+        """ Test getting user profile based on user ID """
+        userId = 27584
+        response = self.client.get_user_profile(userId)
+        self.assertEqual(response[0], 200)
+        self.assertIsNotNone(response[1]['companyId'])
 
     def test_get_products(self):
         """ get all products from API """
 
         response_all = self.client.get_products()
-        self.assertIsNotNone(response_all)
+        self.assertEqual(response_all[0], 200)
+        self.assertIsNotNone(response_all[1])
 
-        """ get products with limit """
+        # data = {
+        #     "previousId": "",
+        #     "limit": "0",
+        #     "group": "",
+        #     "type": "PURCHASE"
+        # }
+        #
+        # response_limit = self.client.get_products(**data)
+        # j = json.loads(response_limit)
+        # self.assertIsNotNone(j)
+        # print(j)
 
-        data = {
-            "previousId": "",
-            "limit": "2",
-            "group": "",
-            "type": "PURCHASE"
-        }
-
-        response_limit = self.client.get_products(**data)
-        self.assertIsNotNone(response_limit)
 
     def test_get_product(self):
         """ get info of one product """
         productId = 723460
         response = self.client.get_product(productId)
-
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
+        self.assertIsNotNone(response[1])
 
     def test_get_product_groups(self):
         """ get product groups (by product type) """
 
-        data = {
-            "productType": "PURCHASE",
-        }
-
         response = self.client.get_product_groups("PURCHASE")
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
+        self.assertIsNotNone(response[1]['productGroups'])
 
     def test_get_vats(self):
         """ get VAT percentages for the current company """
         response = self.client.get_vats()
-
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
+        self.assertIsNotNone(response[1]['vatInformation'][0]['country'])
 
     def test_get_vats_country(self):
         """ get VAT percentages available for the given country """
         response = self.client.get_vats_country('FI')
-
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
+        self.assertIn(24.0, response[1]['vatPercentages'])
 
     def test_get_invoices(self):
-        # data = {
-        #     "status": "",
-        #     "startDate": "",
-        #     "endDate": "",
-        #     "types":"",
-        #     #"orderById": "asc",
-        #     "orderByDate": ""
-        # }
+        data = {
+            "status": "UNFINISHED",
+            "startDate": "2018-02-10",
+            "endDate": "2018-02-18",
+            "types": "TRAVEL_INVOICE,PURCHASE_INVOICE",
+            #"orderById": "asc",
+            "orderByDate": "asc"
+        }
 
-        response = self.client.get_invoices(0)
+        response = self.client.get_invoices(8203820, **data)
 
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
+        self.assertIsNotNone(response[1])
 
     def test_get_invoice(self):
-        response = self.client.get_invoice(8203037)
+        invoiceId = 8204221
+        response = self.client.get_invoice(invoiceId)
+        self.assertEqual(response[0], 200)
+        self.assertEqual(response[1]['id'], invoiceId)
 
-        self.assertIsNotNone(response)
-
-    def test_post_invoice(self):
+    def test_invoice(self):
         date = str(datetime.date.today())
         dueDate = str(datetime.date.today() + datetime.timedelta(weeks=2))
         data = {
-            "type": "SALES_INVOICE",
+            "type": "PURCHASE_INVOICE",
             "status": "UNFINISHED",
             "date": date,
             "counterParty": {
@@ -157,26 +165,45 @@ class TestClient(unittest.TestCase):
             "language" : "FINNISH"
         }
 
-        response = self.client.post_invoice(**data)
+        post_response = self.client.post_invoice(**data)
 
-        self.assertIsNotNone(response)
+        self.assertIsNotNone(post_response[1]['id'])
+        invoiceId = post_response[1]['id']
 
-    def test_approve_invoice(self):
-        pass
+        # TODO fix this (something goes wrong when trying send to circulation)
+        circulation_response = self.client.send_invoice_to_circulation(invoiceId)
+        self.assertEqual(circulation_response, 403)
 
-    def test_send_invoice_to_circulation(self):
-        pass
+        verify_response = self.client.verify_invoice(invoiceId)
+        self.assertEqual(verify_response, 200)
 
-    def test_verify_invoice(self):
-        pass
+        approve_response = self.client.approve_invoice(invoiceId)
+        self.assertEqual(approve_response, 200)
 
-    def test_pay_invoice(self):
-        pass
-
+    #     # otp = "dyrn"
+    #     # data = {
+    #     #     "paymentData": [
+    #     #         {
+    #     #             "invoiceId": invoiceId,
+    #     #             "payDate": date
+    #     #         }
+    #     #     ],
+    #     #     "oneTimePassword": otp
+    #     # }
+    #     # pay_response = self.client.pay_invoice(**data)
+    #     # self.assertIsNotNone(pay_response)
+    #
     def test_get_currencies(self):
         response = self.client.get_currencies()
 
-        self.assertIsNotNone(response)
+        currencies = response[1]['currencies']
+        self.assertEqual(response[0], 200)
+        self.assertIn("EUR", currencies)
+
+    def test_get_currency(self):
+        response = self.client.get_currency()
+
+        self.assertEqual(response[0], 200)
 
     def test_get_exchange_rate(self):
         data = {
@@ -187,53 +214,81 @@ class TestClient(unittest.TestCase):
         }
 
         response = self.client.get_exchange_rate(**data)
-
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
+        self.assertEqual(response[1]['currency'], 'EUR')
 
     def test_get_latest_currency_rate(self):
         response = self.client.get_latest_currency_rate(1)
-
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
 
     def test_get_dimensions(self):
         response = self.client.get_dimensions()
-
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
+        self.assertIsNotNone(response[1][0]['id'])
 
     def test_get_dimension(self):
         dimensionId = 86160
         response = self.client.get_dimension(dimensionId)
-
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
+        self.assertIsNotNone(response[1]['id'])
 
     def test_get_fiscal_years(self):
         response = self.client.get_fiscal_years()
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
 
     def test_get_ledger_receipts(self):
-        response = self.client.get_ledger_receipts(0)
-        self.assertIsNotNone(response)
+        data = {
+            "startDate": "2018-02-12",
+            "endDate": "2018-02-14",
+            "types": "PURCHASE_INVOICE",
+            "orderById": "asc",
+        }
+        previousId = 13787852
+        response = self.client.get_ledger_receipts(previousId, **data)
+        self.assertEqual(response[0], 200)
+
+        if data['orderById'] is "desc":
+            self.assertLess(response[1]['results'][0]['receiptId'], previousId)
+        elif data['orderById'] is "asc":
+            self.assertGreater(response[1]['results'][0]['receiptId'], previousId)
 
     def test_get_ledger_receipt(self):
-        response = self.client.get_ledger_receipt(13786856)
-        self.assertIsNotNone(response)
+        receiptId = 13787902
+        response = self.client.get_ledger_receipt(receiptId)
+        self.assertEqual(response[0], 200)
+        self.assertEqual(response[1]['receiptId'], receiptId)
 
-    def test_update_ledger_receipt(self):
-        pass
-
+    # def test_update_ledger_receipt(self):
+    #     data = {
+    #         "vatStatus": 1,
+    #     }
+    #
+    #     response = self.client.update_ledger_receipt(13787902, **data)
+    #     self.assertIsNotNone(response)
+    #     print(response)
+    #
     def test_get_coa(self):
         response = self.client.get_coa()
-        self.assertIsNotNone(response)
+        self.assertEqual(response[0], 200)
+        self.assertIs(type(response[1]['ledgerAccounts']), list)
 
     def test_get_business_partner(self):
-        pass
+        partnerId = 1517286
+        response = self.client.get_business_partner(partnerId)
+        self.assertEqual(response[0], 200)
+        self.assertEqual(response[1]['id'], partnerId)
+
+    def test_get_business_partner_details(self):
+        response = self.client.get_business_partner_details()
+        self.assertEqual(response[0], 200)
+        self.assertIsNotNone(response[1]['personId'])
 
     def test_get_bank_statements(self):
-        # startDate = "2017-12-01"
-        # endDate = "2018-01-23"
-        #
-        # response = self.client.get_bank_statements(startDate, endDate)
-        pass
+        startDate = "2018-02-01"
+        endDate = "2018-02-14"
+
+        response = self.client.get_bank_statements(startDate, endDate)
+        self.assertEqual(response[0], 200)
 
     def test_delete_products_from_bank_statement(self):
         # statementId = 1234
@@ -247,22 +302,21 @@ class TestClient(unittest.TestCase):
 
     def test_get_attachment(self):
         response = self.client.get_attachment(1528)
+        self.assertEqual(response[0], 200)
 
-        self.assertIsNotNone(response)
+    # # def test_post_attachment(self):
+    # #     meta = {
+    # #         "name": "test.txt",
+    # #         "referenceType": "INVOICE",
+    # #         "referenceId": 8197608,
+    # #     }
+    # #
+    # #     filename = "/Users/joonasmaliniemi/Desktop/test.txt"
+    # #     response = self.client.post_attachment(meta, filename)
+    # #     self.assertIsNotNone(response)
+    # #     attachmentId = response['id']
+    # #     responseDelete = self.client.delete_attachment(attachmentId)
+    # #     self.assertIsNotNone(responseDelete)
 
-    # def test_post_attachment(self):
-    #     meta = {
-    #         "name": "test.txt",
-    #         "referenceType": "INVOICE",
-    #         "referenceId": 8197608,
-    #     }
-    #
-    #     filename = "/Users/joonasmaliniemi/Desktop/test.txt"
-    #     response = self.client.post_attachment(meta, filename)
-    #     self.assertIsNotNone(response)
-    #     attachmentId = response['id']
-    #     responseDelete = self.client.delete_attachment(attachmentId)
-    #     self.assertIsNotNone(responseDelete)
-    
 if __name__ == '__main__':
     unittest.main()
