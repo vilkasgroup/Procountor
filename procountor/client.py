@@ -71,9 +71,6 @@ class Client():
         r = requests.post(Client.auth_url + '?response_type=code&client_id=' + self.client_id + "&state=123456789",
                           params=params, headers=headers)
 
-        if r.status_code != 401:
-            r.raise_for_status()
-
         # have to get value of query parameter named 'code'
         self.auth_code = parse_qs(urlparse(r.url).query)['code'][0]
 
@@ -101,8 +98,7 @@ class Client():
         }
 
         r = requests.post(Client.token_url, params=params, headers=headers)
-        if r.status_code != 400:
-            r.raise_for_status()
+
         for key, value in r.json().items():
             if key == 'access_token':
                 self.access_token = value
@@ -131,7 +127,6 @@ class Client():
         }
 
         r = requests.post(Client.token_url, params=params, headers=headers)
-        r.raise_for_status()
         self.access_token = r.json().get('access_token')
 
         return self.access_token
@@ -731,12 +726,9 @@ class Client():
         if r.status_code == 401:
             self.access_token = self.refresh_access_token(self.refresh_token)
             r = requests.request(method, self.api_url + endpoint, headers=self.headers(method, endpoint), json=kwargs)
-            if r.status_code != 429:
-                r.raise_for_status()
             return r
         else:
-            if r.status_code != 429:
-                r.raise_for_status()
+
             return r
 
     def headers(self, method, endpoint):
