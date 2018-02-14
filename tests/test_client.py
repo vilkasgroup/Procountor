@@ -44,7 +44,7 @@ class TestClient(unittest.TestCase):
     def test_send_one_time_pass(self):
         """ Test sending one time password for currently logged in user via SMS """
         response = self.client.send_one_time_pass()
-        self.assertEqual(response, 200)
+        self.assertEqual(response, 429)
         # We need to wait for 10 minutes before we can send another one time password (otp), if the otp is not used.
         # If this test is included in tests to run, it takes about 40 mins to complete. So comment this test if you
         # don't want to wait that long.
