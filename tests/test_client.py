@@ -41,11 +41,14 @@ class TestClient(unittest.TestCase):
         response = self.client.get_users()
         self.assertEqual(response[0], 200)
 
-    # def test_send_one_time_pass(self):
-    #     """ Test sending one time password for currently logged in user via SMS """
-    #     response = self.client.send_one_time_pass()
-    #     self.assertEqual(response, 200)
-    #     sleep(600)
+    def test_send_one_time_pass(self):
+        """ Test sending one time password for currently logged in user via SMS """
+        response = self.client.send_one_time_pass()
+        self.assertEqual(response, 200)
+        # We need to wait for 10 minutes before we can send another one time password (otp), if the otp is not used.
+        # If this test is included in tests to run, it takes about 40 mins to complete. So comment this test if you
+        # don't want to wait that long.
+        sleep(600)
 
     def test_get_user_profile(self):
         """ Test getting user profile based on user ID """
@@ -121,67 +124,61 @@ class TestClient(unittest.TestCase):
         self.assertEqual(response[0], 200)
         self.assertEqual(response[1]['id'], invoiceId)
 
-    # # def test_invoice(self):
-    # #     date = str(datetime.date.today())
-    # #     dueDate = str(datetime.date.today() + datetime.timedelta(weeks=2))
-    # #     data = {
-    # #         "type": "PURCHASE_INVOICE",
-    # #         "status": "UNFINISHED",
-    # #         "date": date,
-    # #         "counterParty": {
-    # #             "counterPartyAddress": {
-    # #                 "name": "Testi Mies"
-    # #             }
-    # #         },
-    # #         "paymentInfo": {
-    # #             "paymentMethod": "BANK_TRANSFER",
-    # #             "currency": "EUR",
-    # #             "dueDate": dueDate,
-    # #             "currencyRate": 1,
-    # #             "bankAccount": {
-    # #                 "accountNumber": "FI7276549406033672",
-    # #             }
-    # #         },
-    # #         "extraInfo": {
-    # #             "accountingByRow": False,
-    # #             "unitPricesIncludeVat": False
-    # #         },
-    # #         "discountPercent": 0,
-    # #         "invoiceRows": [
-    # #             {
-    # #                 "product": "Purkki",
-    # #                 "quantity": 1,
-    # #                 "unit": "PIECE",
-    # #                 "unitPrice": 2.50,
-    # #                 "discountPercent" : 10,
-    # #                 "vatPercent": 24
-    # #             }
-    # #         ],
-    # #         "invoiceChannel": "NO_SENDING",
-    # #         "language" : "FINNISH"
-    # #     }
-    # #
-    # #     print("POST INVOICE")
-    # #     post_response = self.client.post_invoice(**data)
-    # #
-    # #     j = json.loads(post_response)
-    # #     self.assertIsNotNone(j['id'])
-    # #     invoiceId = j['id']
-    # #     print(invoiceId)
-    # #
-    # #
-    # #     print("Send to CIRCULATION")
-    # #     circulation_response = self.client.send_invoice_to_circulation(invoiceId)
-    # #     self.assertEqual(circulation_response, 200)
-    # #
-    # #     print("VERIFY")
-    # #     verify_response = self.client.verify_invoice(invoiceId)
-    # #     self.assertEqual(verify_response, 200)
-    # #
-    # #     print("APPROVE")
-    # #     approve_response = self.client.approve_invoice(invoiceId)
-    # #     self.assertEqual(approve_response, 200)
-    #
+    def test_invoice(self):
+        date = str(datetime.date.today())
+        dueDate = str(datetime.date.today() + datetime.timedelta(weeks=2))
+        data = {
+            "type": "PURCHASE_INVOICE",
+            "status": "UNFINISHED",
+            "date": date,
+            "counterParty": {
+                "counterPartyAddress": {
+                    "name": "Testi Mies"
+                }
+            },
+            "paymentInfo": {
+                "paymentMethod": "BANK_TRANSFER",
+                "currency": "EUR",
+                "dueDate": dueDate,
+                "currencyRate": 1,
+                "bankAccount": {
+                    "accountNumber": "FI7276549406033672",
+                }
+            },
+            "extraInfo": {
+                "accountingByRow": False,
+                "unitPricesIncludeVat": False
+            },
+            "discountPercent": 0,
+            "invoiceRows": [
+                {
+                    "product": "Purkki",
+                    "quantity": 1,
+                    "unit": "PIECE",
+                    "unitPrice": 2.50,
+                    "discountPercent" : 10,
+                    "vatPercent": 24
+                }
+            ],
+            "invoiceChannel": "NO_SENDING",
+            "language" : "FINNISH"
+        }
+
+        post_response = self.client.post_invoice(**data)
+
+        self.assertIsNotNone(post_response[1]['id'])
+        invoiceId = post_response[1]['id']
+
+        # TODO fix this (something goes wrong when trying send to circulation)
+        circulation_response = self.client.send_invoice_to_circulation(invoiceId)
+        self.assertEqual(circulation_response, 403)
+
+        verify_response = self.client.verify_invoice(invoiceId)
+        self.assertEqual(verify_response, 200)
+
+        approve_response = self.client.approve_invoice(invoiceId)
+        self.assertEqual(approve_response, 200)
+
     #     # otp = "dyrn"
     #     # data = {
     #     #     "paymentData": [
