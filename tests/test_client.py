@@ -41,15 +41,15 @@ class TestClient(unittest.TestCase):
         response = self.client.get_users()
         self.assertEqual(response[0], 200)
 
-    def test_send_one_time_pass(self):
-        """ Test sending one time password for currently logged in user via SMS """
-        response = self.client.send_one_time_pass()
-        # After the first test status code is 429 as explained below
-        self.assertEqual(response, 429 or 200)
-        # We need to wait for 10 minutes before we can send another one time password (otp), if the otp is not used.
-        # If this test is included in tests to run, it takes about 40 mins to complete. So comment this test if you
-        # don't want to wait that long.
-        # sleep(600)
+    # def test_send_one_time_pass(self):
+    #     """ Test sending one time password for currently logged in user via SMS """
+    #     response = self.client.send_one_time_pass()
+    #     # After the first test status code is 429 as explained below
+    #     self.assertEqual(response, 200)
+    #     # We need to wait for 10 minutes before we can send another one time password (otp), if the otp is not used.
+    #     # If this test is included in tests to run, it takes about 40 mins to complete. So comment this test if you
+    #     # don't want to wait that long.
+    #     # sleep(600)
 
     def test_get_user_profile(self):
         """ Test getting user profile based on user ID """
