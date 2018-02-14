@@ -140,33 +140,39 @@ class Client():
     def get_users(self):
         """Method returns details of the currently logged in user based on the access token
 
-        :return: user information, dict
+        :return: response's status code and user information, list
         """
 
         method = "GET"
         endpoint = "users"
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def send_one_time_pass(self):
-        """Sends an one time password for current user via SMS """
+        """Sends an one time password for current user via SMS
+
+        :return: status code of the response, integer
+        """
 
         method = "GET"
         endpoint = "users/otp"
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return response.status_code
 
     def get_user_profile(self, userId):
         """Method gets a user profile based on the given user ID
 
         :param userId: requested user's ID, integer
-        :return: user profile, dict
+        :return: response's status code and user profile, list
         """
 
         method = "GET"
         endpoint = "users/profiles/{}".format(str(userId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     # PRODUCTS
     def get_products(self, **kwargs):
@@ -193,7 +199,8 @@ class Client():
                 else:
                     endpoint += "{}={}".format(key, str(value))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_product(self, productId):
         """Method gets and returns the requested product based on the productId
@@ -205,7 +212,8 @@ class Client():
         method = "GET"
         endpoint = "products/{}".format(productId)
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_product_groups(self, productType):
         """Method gets and returns product groups by product type
@@ -217,7 +225,8 @@ class Client():
         method = "GET"
         endpoint = "products/groups?productType={}".format(productType)
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     # VATs
     def get_vats(self):
@@ -229,7 +238,8 @@ class Client():
         method = "GET"
         endpoint = "vats/default"
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_vats_country(self, countryCode):
         """Method gets and returns VAT percentages available for the given country
@@ -241,7 +251,8 @@ class Client():
         method = "GET"
         endpoint = "vats/country?countryCode={}".format(countryCode)
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     # INVOICES
     def get_invoices(self, previousId, **kwargs):
@@ -275,7 +286,8 @@ class Client():
                 else:
                     endpoint += "{}={}&previousId={}".format(key, str(value), str(previousId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_invoice(self, invoiceId):
         """Method gets and returns the requested invoice. Supports expense (bill of charges), purchase,
@@ -287,7 +299,8 @@ class Client():
         method = "GET"
         endpoint = "invoices/{}".format(str(invoiceId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def post_invoice(self, **kwargs):
         """Method posts new invoice to Procountor.
@@ -301,7 +314,8 @@ class Client():
         if kwargs is None:
             raise ValueError("No data given")
 
-        return self.request(method, endpoint, **kwargs)
+        response = self.request(method, endpoint, **kwargs)
+        return [response.status_code, response.json]
 
     def approve_invoice(self, invoiceId, **kwargs):
         """Method approves invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure
@@ -314,7 +328,8 @@ class Client():
         method = "PUT"
         endpoint = "invoices/{}/approve".format(str(invoiceId))
 
-        return self.request(method, endpoint, **kwargs)
+        response = self.request(method, endpoint, **kwargs)
+        return response.status_code
 
     def send_invoice_to_circulation(self, invoiceId):
         """Method sends requested invoice to circulation. Supports travel and expense invoices. Invoice circulation
@@ -327,7 +342,8 @@ class Client():
         method = "PUT"
         endpoint = "invoices/{}/sendToCirculation".format(str(invoiceId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return response.status_code
 
     def verify_invoice(self, invoiceId, **kwargs):
         """Method verifies invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure
@@ -340,7 +356,8 @@ class Client():
         method = "PUT"
         endpoint = "invoices/{}/verify".format(str(invoiceId))
 
-        return self.request(method, endpoint, **kwargs)
+        response = self.request(method, endpoint, **kwargs)
+        return response.status_code
 
     def pay_invoice(self, **kwargs):
         """Method to pay invoices in Procountor. Supports purchase invoices and self-assessed tax invoices. All of the
@@ -355,7 +372,8 @@ class Client():
         method = "PUT"
         endpoint = "invoices/pay"
 
-        return self.request(method, endpoint, **kwargs)
+        response = self.request(method, endpoint, **kwargs)
+        return response.status_code
 
     # CURRENCIES
     def get_currencies(self):
@@ -367,7 +385,8 @@ class Client():
         method = "GET"
         endpoint = "currencies"
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_currency(self):
         """Gets and returns currency for the current company.
@@ -378,7 +397,8 @@ class Client():
         method = "GET"
         endpoint = "currencies/company"
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_exchange_rate(self, **kwargs):
         """Gets and returns an exchange rate for the given currency.
@@ -407,7 +427,8 @@ class Client():
         else:
             raise ValueError("No data given")
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_latest_currency_rate(self, rateType):
         """Gets and returns list of currency rates for the company base currency
@@ -420,7 +441,8 @@ class Client():
         method = "GET"
         endpoint = "currencies/latest?rateType={}".format(str(rateType))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     # DIMENSIONS
     def get_dimensions(self):
@@ -433,7 +455,8 @@ class Client():
         method = "GET"
         endpoint = "dimensions"
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_dimension(self, dimensionId):
         """Gets and returns a specified dimension with its dimension items
@@ -445,7 +468,8 @@ class Client():
         method = "GET"
         endpoint = "dimensions/{}".format(str(dimensionId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     # FISCAL YEARS
     def get_fiscal_years(self):
@@ -458,7 +482,8 @@ class Client():
         method = "GET"
         endpoint = "fiscalyears"
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     # LEDGER RECEIPTS
     def get_ledger_receipts(self, previousId, **kwargs):
@@ -491,7 +516,8 @@ class Client():
         else:
             raise ValueError("No data given")
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_ledger_receipt(self, receiptId):
         """Method gets and returns the requested ledger receipt. Supported ledger receipt types are journals, sales
@@ -504,7 +530,8 @@ class Client():
         method = "GET"
         endpoint = "ledgerreceipts/{}".format(str(receiptId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def post_ledger_receipt(self, **kwargs):
         """Method sends new ledger receipt to Procountor, Supports journal type ledger receipts
@@ -518,7 +545,8 @@ class Client():
         if kwargs is None:
             raise ValueError('No data given')
 
-        return self.request(method, endpoint, **kwargs)
+        response = self.request(method, endpoint, **kwargs)
+        return [response.status_code, response.json()]
 
     def update_ledger_receipt(self, receiptId, **kwargs):
         """Method updates requested ledger receipt in Procountor environment. Supported ledger receipt types are
@@ -535,7 +563,8 @@ class Client():
         if kwargs is None:
             raise ValueError('No data given')
 
-        return self.request(method, endpoint, **kwargs)
+        response = self.request(method, endpoint, **kwargs)
+        return response.status_code
 
     # CHART OF ACCOUNTS
     def get_coa(self):
@@ -548,7 +577,8 @@ class Client():
         method = "GET"
         endpoint = "coa"
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     # BUSINESS PARTNERS
     def get_business_partner(self, partnerId):
@@ -561,7 +591,8 @@ class Client():
         method = "GET"
         endpoint = "businesspartners/{}".format(str(partnerId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_business_partner_details(self):
         """Method gets and returns basic information on person register entry for currently logged in user.
@@ -573,7 +604,8 @@ class Client():
         method = "GET"
         endpoint = "businesspartners/personaldetails"
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     # BANK STATEMENTS
     def get_bank_statements(self, startDate, endDate):
@@ -589,7 +621,8 @@ class Client():
         method = "GET"
         endpoint = "bankstatements?startDate={}&endDate={}".format(startDate, endDate)
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def delete_products_from_bank_statement(self, statementId, eventId):
         """Method deletes allocation of a product from a bank statement event
@@ -601,7 +634,8 @@ class Client():
         method = "DELETE"
         endpoint = "bankstatements/{}/events/{}/products".format(str(statementId), str(eventId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return response.status_code
 
     def put_products_to_bank_statement(self, statementId, eventId, **kwargs):
         """Method allocates a product to a bank statement event
@@ -614,7 +648,8 @@ class Client():
         method = "PUT"
         endpoint = "bankstatements/{}/events/{}/products".format(str(statementId), str(eventId))
 
-        return self.request(method, endpoint, **kwargs)
+        response = self.request(method, endpoint, **kwargs)
+        return response.status_code
 
     # ATTACHMENTS
     def get_attachment(self, attachmentId):
@@ -627,7 +662,8 @@ class Client():
         method = "GET"
         endpoint = "attachments/{}".format(str(attachmentId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return [response.status_code, response.content]
 
     def delete_attachment(self, attachmentId):
         """Deletes requested attachment
@@ -637,7 +673,8 @@ class Client():
         method = "DELETE"
         endpoint = "attachments/{}".format(str(attachmentId))
 
-        return self.request(method, endpoint)
+        response = self.request(method, endpoint)
+        return response.status_code
 
     def post_attachment(self, meta, filename):
         """Method sends new attachment to Procountor. The attachment can be of any type but limited to max 10000000
@@ -661,9 +698,9 @@ class Client():
                 self.access_token = self.refresh_access_token(self.refresh_token)
                 r = requests.request(method, self.api_url + endpoint, files=files,
                                      headers=self.headers(method, endpoint))
-                return json.loads(r.content)
+                return [r.status_code, json.loads(r.content)]
             else:
-                return json.loads(r.content)
+                return [r.status_code, json.loads(r.content)]
 
     def request(self, method, endpoint, *args, **kwargs):
         """Method to make HTTP requests over Procountor REST API
@@ -678,21 +715,10 @@ class Client():
         if r.status_code == 401:
             self.access_token = self.refresh_access_token(self.refresh_token)
             r = requests.request(method, self.api_url + endpoint, headers=self.headers(method, endpoint), json=kwargs)
-            # r.raise_for_status()
-
-            if method == "GET" and "attachments" in endpoint:
-                return r.content
-            elif method == "PUT":
-                return r.status_code
-            else:
-                return r.text
+            r.raise_for_status()
+            return r
         else:
-            if method == "GET" and "attachments" in endpoint:
-                return r.content
-            elif method == "PUT":
-                return r.status_code
-            else:
-                return r.text
+            return r
 
     def headers(self, method, endpoint):
         """Method returns correct headers for request.
