@@ -48,7 +48,7 @@ class TestClient(unittest.TestCase):
         # We need to wait for 10 minutes before we can send another one time password (otp), if the otp is not used.
         # If this test is included in tests to run, it takes about 40 mins to complete. So comment this test if you
         # don't want to wait that long.
-        sleep(600)
+        # sleep(600)
 
     def test_get_user_profile(self):
         """ Test getting user profile based on user ID """
