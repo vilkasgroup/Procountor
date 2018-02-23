@@ -2,6 +2,7 @@ import os
 import unittest
 import datetime
 import json
+import tempfile
 from time import sleep
 from procountor.client import Client
 
@@ -41,15 +42,14 @@ class TestClient(unittest.TestCase):
         response = self.client.get_users()
         self.assertEqual(response[0], 200)
 
-    # def test_send_one_time_pass(self):
-    #     """ Test sending one time password for currently logged in user via SMS """
-    #     response = self.client.send_one_time_pass()
-    #     # After the first test status code is 429 as explained below
-    #     self.assertEqual(response, 200)
-    #     # We need to wait for 10 minutes before we can send another one time password (otp), if the otp is not used.
-    #     # If this test is included in tests to run, it takes about 40 mins to complete. So comment this test if you
-    #     # don't want to wait that long.
-    #     # sleep(600)
+    def test_send_one_time_pass(self):
+        """ Test sending one time password for currently logged in user via SMS """
+        response = self.client.send_one_time_pass()
+        # After the first test status code is 429 if not waited 10 minutes
+        if response != 200:
+            self.assertEqual(response, 429)
+        else:
+            self.assertEqual(response, 200)
 
     def test_get_user_profile(self):
         """ Test getting user profile based on user ID """
@@ -61,22 +61,9 @@ class TestClient(unittest.TestCase):
     def test_get_products(self):
         """ get all products from API """
 
-        response_all = self.client.get_products()
-        self.assertEqual(response_all[0], 200)
-        self.assertIsNotNone(response_all[1])
-
-        # data = {
-        #     "previousId": "",
-        #     "limit": "0",
-        #     "group": "",
-        #     "type": "PURCHASE"
-        # }
-        #
-        # response_limit = self.client.get_products(**data)
-        # j = json.loads(response_limit)
-        # self.assertIsNotNone(j)
-        # print(j)
-
+        response = self.client.get_products()
+        self.assertEqual(response[0], 200)
+        self.assertIsNotNone(response[1])
 
     def test_get_product(self):
         """ get info of one product """
@@ -266,7 +253,7 @@ class TestClient(unittest.TestCase):
     #     response = self.client.update_ledger_receipt(13787902, **data)
     #     self.assertIsNotNone(response)
     #     print(response)
-    #
+
     def test_get_coa(self):
         response = self.client.get_coa()
         self.assertEqual(response[0], 200)
@@ -291,11 +278,11 @@ class TestClient(unittest.TestCase):
         self.assertEqual(response[0], 200)
 
     def test_delete_products_from_bank_statement(self):
-        # statementId = 1234
-        # eventId = 4321
-        #
-        # response = self.client.delete_products_from_bank_statement(statementId, eventId)
-        pass
+        statementId = 1234
+        eventId = 4321
+
+        response = self.client.delete_products_from_bank_statement(statementId, eventId)
+        self.assertEqual(response, 403)
 
     def test_put_products_to_bank_statement(self):
         pass
@@ -304,19 +291,36 @@ class TestClient(unittest.TestCase):
         response = self.client.get_attachment(1528)
         self.assertEqual(response[0], 200)
 
-    # # def test_post_attachment(self):
-    # #     meta = {
-    # #         "name": "test.txt",
-    # #         "referenceType": "INVOICE",
-    # #         "referenceId": 8197608,
-    # #     }
-    # #
-    # #     filename = "/Users/joonasmaliniemi/Desktop/test.txt"
-    # #     response = self.client.post_attachment(meta, filename)
-    # #     self.assertIsNotNone(response)
-    # #     attachmentId = response['id']
-    # #     responseDelete = self.client.delete_attachment(attachmentId)
-    # #     self.assertIsNotNone(responseDelete)
+    def test_post_attachment(self):
+
+        f = tempfile.NamedTemporaryFile(mode='w+b', delete=False, suffix='.txt', prefix='test_')
+        f.write(b"Temp file")
+        f.close()
+        print(f.name)
+
+        meta = {
+            "name": "test.txt",
+            "referenceType": "INVOICE",
+            "referenceId": 8197608,
+        }
+
+        response = self.client.post_attachment(meta, f.name)
+        self.assertEqual(response[0], 200)
+        attachmentId = response[1]['id']
+        print(attachmentId)
+
+        os.unlink(f.name)
+
+        responseDelete = self.client.delete_attachment(attachmentId)
+        self.assertEqual(responseDelete, 200)
+
+    def test_request(self):
+        response = self.client.request("GET", "users")
+        self.assertIsNotNone(response)
+
+    def test_headers(self):
+        response = self.client.headers("GET", "users")
+        self.assertEqual(response['authorization'], "Bearer {}".format(self.client.access_token))
 
 if __name__ == '__main__':
     unittest.main()
