@@ -167,19 +167,19 @@ class TestClient(unittest.TestCase):
         approve_response = self.client.approve_invoice(invoiceId)
         self.assertEqual(approve_response, 200)
 
-    #     # otp = "dyrn"
-    #     # data = {
-    #     #     "paymentData": [
-    #     #         {
-    #     #             "invoiceId": invoiceId,
-    #     #             "payDate": date
-    #     #         }
-    #     #     ],
-    #     #     "oneTimePassword": otp
-    #     # }
-    #     # pay_response = self.client.pay_invoice(**data)
-    #     # self.assertIsNotNone(pay_response)
-    #
+        # otp = "dyrn"
+        # data = {
+        #     "paymentData": [
+        #         {
+        #             "invoiceId": invoiceId,
+        #             "payDate": date
+        #         }
+        #     ],
+        #     "oneTimePassword": otp
+        # }
+        # pay_response = self.client.pay_invoice(**data)
+        # self.assertIsNotNone(pay_response)
+
     def test_get_currencies(self):
         response = self.client.get_currencies()
 
