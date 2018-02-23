@@ -167,18 +167,18 @@ class TestClient(unittest.TestCase):
         approve_response = self.client.approve_invoice(invoiceId)
         self.assertEqual(approve_response, 200)
 
-        # otp = "dyrn"
-        # data = {
-        #     "paymentData": [
-        #         {
-        #             "invoiceId": invoiceId,
-        #             "payDate": date
-        #         }
-        #     ],
-        #     "oneTimePassword": otp
-        # }
-        # pay_response = self.client.pay_invoice(**data)
-        # self.assertIsNotNone(pay_response)
+        otp = "dyrn"
+        pay_data = {
+            "paymentData": [
+                {
+                    "invoiceId": invoiceId,
+                    "payDate": date
+                }
+            ],
+            "oneTimePassword": otp
+        }
+        pay_response = self.client.pay_invoice(**pay_data)
+        self.assertEqual(pay_response, 401)
 
     def test_get_currencies(self):
         response = self.client.get_currencies()
@@ -296,7 +296,6 @@ class TestClient(unittest.TestCase):
         f = tempfile.NamedTemporaryFile(mode='w+b', delete=False, suffix='.txt', prefix='test_')
         f.write(b"Temp file")
         f.close()
-        print(f.name)
 
         meta = {
             "name": "test.txt",
@@ -307,7 +306,6 @@ class TestClient(unittest.TestCase):
         response = self.client.post_attachment(meta, f.name)
         self.assertEqual(response[0], 200)
         attachmentId = response[1]['id']
-        print(attachmentId)
 
         os.unlink(f.name)
 
