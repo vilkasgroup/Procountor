@@ -728,7 +728,6 @@ class Client():
             r = requests.request(method, self.api_url + endpoint, headers=self.headers(method, endpoint), json=kwargs)
             return r
         else:
-
             return r
 
     def headers(self, method, endpoint):
