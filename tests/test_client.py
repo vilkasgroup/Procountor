@@ -59,9 +59,13 @@ class TestClient(unittest.TestCase):
         self.assertIsNotNone(response[1]['companyId'])
 
     def test_get_products(self):
-        """ get all products from API """
 
-        response = self.client.get_products()
+        date = str(datetime.date.today())
+        data = {
+            'previousId': 723460,
+            'endDate': date
+        }
+        response = self.client.get_products(**data)
         self.assertEqual(response[0], 200)
         self.assertIsNotNone(response[1])
 
@@ -153,7 +157,7 @@ class TestClient(unittest.TestCase):
         }
 
         post_response = self.client.post_invoice(**data)
-
+        self.assertEqual(post_response[0], 200)
         self.assertIsNotNone(post_response[1]['id'])
         invoiceId = post_response[1]['id']
 
