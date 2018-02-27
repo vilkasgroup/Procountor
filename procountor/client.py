@@ -24,16 +24,14 @@ class Client():
     token_url = "https://api-test.procountor.com/api/oauth/token/"
     api_url = "https://api-test.procountor.com/api/"
 
-    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri, access_token,
-                 refresh_token):
+    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri):
         self.username = username
         self.password = password
         self.company_id = company_id
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
-        self.access_token = access_token
-        self.refresh_token = refresh_token
+        self.get_tokens()
 
     def invalidate_token(self):
         """Method invalidates the access token"""
@@ -68,27 +66,28 @@ class Client():
             'content-type': 'application/x-www-form-urlencoded'
         }
 
-        r = requests.post(Client.auth_url + '?response_type=code&client_id=' + self.client_id + "&state=123456789",
-                          params=params, headers=headers)
+        r = requests.post(Client.auth_url + '?response_type=code&client_id=' + self.client_id + "&state=123456",
+                          params=params, headers=headers, allow_redirects=False)
 
         # have to get value of query parameter named 'code'
-        self.auth_code = parse_qs(urlparse(r.url).query)['code'][0]
+        if r.status_code == 302:
+            auth_code = parse_qs(urlparse(r.headers['Location']).query)['code'][0]
 
-        return self.auth_code
+        return auth_code
 
-    def get_tokens(self, auth_code):
+    def get_tokens(self):
         """Makes a request and returns access token and refresh token for coming requests. Access token is valid for
         3600 seconds and has to refresh after that with refresh token. Refresh token is valid always.
 
         :return: granted tokens, dict
         """
 
-        self.auth_code = auth_code
+        auth_code = self.get_auth_code()
 
         params = {
             'grant_type': 'authorization_code',
             'redirect_uri': self.redirect_uri,
-            'code': self.auth_code,
+            'code': auth_code,
             'client_id': self.client_id,
             'client_secret': self.client_secret,
         }
@@ -99,16 +98,19 @@ class Client():
 
         r = requests.post(Client.token_url, params=params, headers=headers)
 
-        for key, value in r.json().items():
-            if key == 'access_token':
-                self.access_token = value
-            if key == 'refresh_token':
-                self.refresh_token = value
+        # for key, value in r.json().items():
+        #     if key == 'access_token':
+        #         self.access_token = value
+        #     if key == 'refresh_token':
+        #         self.refresh_token = value
+
+        self.access_token = r.json()['access_token']
+        self.refresh_token = r.json()['refresh_token']
 
         tokens = {'access_token': self.access_token, 'refresh_token': self.refresh_token}
         return tokens
 
-    def refresh_access_token(self, refresh_token):
+    def refresh_access_token(self):
         """If the access token is expired (3600 seconds), new access token is granted with refresh token
 
         :param refresh_token: token to get new access token, string
@@ -706,7 +708,7 @@ class Client():
 
             r = requests.request(method, self.api_url + endpoint, files=files, headers=self.headers(method, endpoint))
             if r.status_code == 401:
-                self.access_token = self.refresh_access_token(self.refresh_token)
+                self.access_token = self.refresh_access_token()
                 r = requests.request(method, self.api_url + endpoint, files=files,
                                      headers=self.headers(method, endpoint))
                 return [r.status_code, json.loads(r.content)]
@@ -724,7 +726,7 @@ class Client():
 
         r = requests.request(method, self.api_url + endpoint, headers=self.headers(method, endpoint), json=kwargs)
         if r.status_code == 401:
-            self.access_token = self.refresh_access_token(self.refresh_token)
+            self.access_token = self.refresh_access_token()
             r = requests.request(method, self.api_url + endpoint, headers=self.headers(method, endpoint), json=kwargs)
             return r
         else:
