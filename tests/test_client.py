@@ -19,8 +19,6 @@ class TestClient(unittest.TestCase):
             client_id = os.environ['PROCOUNTOR_CLIENT_ID'],
             client_secret = os.environ['PROCOUNTOR_CLIENT_SECRET'],
             redirect_uri = os.environ['PROCOUNTOR_REDIRECT_URI'],
-            access_token = os.environ['PROCOUNTOR_ACCESS_TOKEN'],
-            refresh_token = os.environ['PROCOUNTOR_REFRESH_TOKEN'],
         )
 
     def test_init(self):
@@ -32,9 +30,19 @@ class TestClient(unittest.TestCase):
         self.assertIsNotNone(self.client.client_id)
         self.assertIsNotNone(self.client.client_secret)
         self.assertIsNotNone(self.client.redirect_uri)
+        self.assertIsNotNone(self.client.access_token)
+        self.assertIsNotNone(self.client.refresh_token)
+
+    def test_get_tokens(self):
+        tokens = self.client.get_tokens()
+        self.assertIsNotNone(tokens['access_token'])
+        self.assertIsNotNone(tokens['refresh_token'])
+
+        invalidate_token = self.client.invalidate_token()
+        print(invalidate_token)
 
     def test_refresh_access_token(self):
-        response = self.client.refresh_access_token(self.client.refresh_token)
+        response = self.client.refresh_access_token()
         self.assertIsNotNone(response)
 
     def test_get_users(self):
