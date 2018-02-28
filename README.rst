@@ -24,9 +24,6 @@ Python library for calling Procountor services
 * Free software: MIT license
 * Documentation: https://Procountor.readthedocs.io.
 
-.. include:: installation.rst
-
-.. include:: usage.rst
 
 Features
 --------

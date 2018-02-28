@@ -39,7 +39,7 @@ class TestClient(unittest.TestCase):
         self.assertIsNotNone(tokens['refresh_token'])
 
         invalidate_token = self.client.invalidate_token()
-        print(invalidate_token)
+        self.assertEqual(invalidate_token, None)
 
     def test_refresh_access_token(self):
         response = self.client.refresh_access_token()
@@ -252,15 +252,6 @@ class TestClient(unittest.TestCase):
         response = self.client.get_ledger_receipt(receiptId)
         self.assertEqual(response[0], 200)
         self.assertEqual(response[1]['receiptId'], receiptId)
-
-    # def test_update_ledger_receipt(self):
-    #     data = {
-    #         "vatStatus": 1,
-    #     }
-    #
-    #     response = self.client.update_ledger_receipt(13787902, **data)
-    #     self.assertIsNotNone(response)
-    #     print(response)
 
     def test_get_coa(self):
         response = self.client.get_coa()
