@@ -77,7 +77,7 @@ class Client():
 
     def get_tokens(self):
         """Makes a request and returns access token and refresh token for coming requests. Access token is valid for
-        3600 seconds and has to refresh after that with refresh token. Refresh token is valid always.
+        3600 seconds and has to be refreshed after that with refresh token. Refresh token is valid always.
 
         :return: granted tokens, dict
         """
