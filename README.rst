@@ -2,7 +2,7 @@
 Procountor
 ===================
 
-.. image:: https://img.shields.io/travis/vilkasgroup/procountor.svg
+.. image:: https://img.shields.io/travis/vilkasgroup/Procountor.svg
    :target: https://travis-ci.org/vilkasgroup/Procountor
    :alt: Build status on travis
 
@@ -10,12 +10,12 @@ Procountor
    :target: https://procountor.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/vilkasgroup/procountor/shield.svg
-   :target: https://pyup.io/repos/github/vilkasgroup/procountor/
+.. image:: https://pyup.io/repos/github/vilkasgroup/Procountor/shield.svg
+   :target: https://pyup.io/repos/github/vilkasgroup/Procountor/
    :alt: Updates status
 
-.. image:: https://coveralls.io/repos/github/vilkasgroup/procountor/badge.svg?branch=master
-   :target: https://coveralls.io/github/vilkasgroup/procountor?branch=master
+.. image:: https://coveralls.io/repos/github/vilkasgroup/Procountor/badge.svg?branch=master
+   :target: https://coveralls.io/github/vilkasgroup/Procountor?branch=master
    :alt: Coveralls status
 
 
