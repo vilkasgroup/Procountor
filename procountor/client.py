@@ -98,12 +98,6 @@ class Client():
 
         r = requests.post(Client.token_url, params=params, headers=headers)
 
-        # for key, value in r.json().items():
-        #     if key == 'access_token':
-        #         self.access_token = value
-        #     if key == 'refresh_token':
-        #         self.refresh_token = value
-
         self.access_token = r.json()['access_token']
         self.refresh_token = r.json()['refresh_token']
 
