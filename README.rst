@@ -3,7 +3,7 @@ Procountor
 ===================
 
 .. image:: https://img.shields.io/travis/vilkasgroup/procountor.svg
-   :target: https://travis-ci.org/vilkasgroup/procountor
+   :target: https://travis-ci.org/vilkasgroup/Procountor
    :alt: Build status on travis
 
 .. image:: https://readthedocs.org/projects/procountor/badge/?version=latest
