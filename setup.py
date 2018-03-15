@@ -25,7 +25,7 @@ test_requirements = [
 
 setup(
     name='Procountor',
-    version='0.0.1',
+    version='0.1.0',
     description="Python library for calling Procountor REST API",
     long_description=readme + '\n\n' + history,
     author="Joonas Maliniemi",
