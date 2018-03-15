@@ -40,7 +40,7 @@ deploy:
       OGdROFpKTWFJTmY2R3cvWW15TWVBU3IzRG9Rc1JJSGlRbXJsRFd1cHZoUFpITVRNSWtBMklVVEE9
   true:
     python: 2.7
-    repo: vilkasgroup/epages_client
+    repo: vilkasgroup/Procountor
     tags: true
 
 after_success:
