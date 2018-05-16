@@ -6,7 +6,7 @@ except ImportError:
     from urlparse import urlparse, parse_qs
 
 
-class Client():
+class Client(object):
     """Class for Procountor accounting API
 
     Following packages need to be installed:
@@ -18,20 +18,32 @@ class Client():
     :param client_id: Procountor REST API client id, string
     :param client_secret: Procountor REST API client secret, string
     :param redirect_uri: URI where redirected after authentication, string
+    :param test_mode: Wether to use test api or real api, bool
     """
 
-    auth_url = "https://api-test.procountor.com/api/oauth/authz/"
-    token_url = "https://api-test.procountor.com/api/oauth/token/"
-    api_url = "https://api-test.procountor.com/api/"
+    _api_host = "https://api.procountor.com"
+    _test_api_host = "https://api-test.procountor.com"
 
-    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri):
+    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri, test_mode=True):
         self.username = username
         self.password = password
         self.company_id = company_id
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
+        self.test_mode = test_mode
         self.get_tokens()
+
+    @property
+    def api_url(self):
+        return self.api_host + "/api/"
+
+    @property
+    def api_host(self):
+        if self.test_mode is True:
+            return Client._test_api_host
+        elif self.test_mode is False:
+            return Client._api_host
 
     def invalidate_token(self):
         """Method invalidates the access token"""
@@ -40,10 +52,10 @@ class Client():
             'authorization': 'Bearer ' + self.access_token
         }
 
-        r = requests.post('https://api-test.procountor.com/logout', headers=headers)
+        r = requests.post(self.api_host + '/logout', headers=headers)
         if r.status_code == 401:
             self.access_token = self.refresh_access_token(self.refresh_token)
-            r = requests.post('https://api-test.procountor.com/logout', headers=headers)
+            r = requests.post(self.api_host + '/logout', headers=headers)
             return r
         elif r.status_code != 200:
             r.raise_for_status()
@@ -66,8 +78,9 @@ class Client():
             'content-type': 'application/x-www-form-urlencoded'
         }
 
-        r = requests.post(Client.auth_url + '?response_type=code&client_id=' + self.client_id + "&state=123456",
-                          params=params, headers=headers, allow_redirects=False)
+        r = requests.post(
+            self.api_url + 'oauth/authz/?response_type=code&client_id=' + self.client_id + "&state=123456",
+            params=params, headers=headers, allow_redirects=False)
 
         # have to get value of query parameter named 'code'
         if r.status_code == 302:
@@ -96,7 +109,7 @@ class Client():
             'content-type': 'application/x-www-form-urlencoded'
         }
 
-        r = requests.post(Client.token_url, params=params, headers=headers)
+        r = requests.post(self.api_url + 'oauth/token/', params=params, headers=headers)
 
         self.access_token = r.json()['access_token']
         self.refresh_token = r.json()['refresh_token']
@@ -122,7 +135,7 @@ class Client():
             'content-type': 'application/x-www-form-urlencoded'
         }
 
-        r = requests.post(Client.token_url, params=params, headers=headers)
+        r = requests.post(self.api_url + 'oauth/token/', params=params, headers=headers)
         self.access_token = r.json().get('access_token')
 
         return self.access_token
