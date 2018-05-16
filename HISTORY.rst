@@ -2,7 +2,7 @@
 History
 =======
 
-0.1.1 (2018-05-16)
+0.2.0 (2018-05-16)
 ------------------
 
 * Add an option for using the real API endpoint
