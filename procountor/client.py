@@ -279,19 +279,13 @@ class Client(object):
         """
 
         method = "GET"
-        endpoint = "invoices"
+        endpoint = "invoices?previousId={}".format(previousId)
         if kwargs is not None:
-            endpoint += "?"
-            index = 0
             for key, value in kwargs.items():
-                index += 1
-                if index < len(kwargs):
-                    endpoint += "{}={}&".format(key, str(value))
-                else:
-                    endpoint += "{}={}&previousId={}".format(key, str(value), str(previousId))
+                endpoint += "&{}={}".format(key, str(value))
 
-        r = self.request(method, endpoint)
-        return [r.status_code, r.json()]
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_invoice(self, invoiceId):
         """Method gets and returns the requested invoice. Supports expense (bill of charges), purchase,
@@ -513,22 +507,14 @@ class Client(object):
         """
 
         method = "GET"
-        endpoint = "ledgerreceipts"
+        endpoint = "ledgerreceipts?previousId={}".format(previousId)
 
         if kwargs is not None:
-            endpoint += "?"
-            index = 0
             for key, value in kwargs.items():
-                index += 1
-                if index < len(kwargs):
-                    endpoint += "{}={}&".format(key, str(value))
-                else:
-                    endpoint += "{}={}&previousId={}".format(key, str(value), str(previousId))
-        else:
-            raise ValueError("No data given")
+                endpoint += "&{}={}".format(key, str(value))
 
-        r = self.request(method, endpoint)
-        return [r.status_code, r.json()]
+        response = self.request(method, endpoint)
+        return [response.status_code, response.json()]
 
     def get_ledger_receipt(self, receiptId):
         """Method gets and returns the requested ledger receipt. Supported ledger receipt types are journals, sales
