@@ -13,6 +13,7 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'requests',
+    'requests-toolbelt'
 ]
 
 setup_requirements = [

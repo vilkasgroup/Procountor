@@ -1,5 +1,7 @@
-import requests
 import json
+
+import requests
+from requests_toolbelt.multipart import decoder
 try:
     from urllib.parse import urlparse, parse_qs
 except ImportError:
@@ -664,8 +666,15 @@ class Client(object):
         method = "GET"
         endpoint = "attachments/{}".format(str(attachmentId))
 
-        r = self.request(method, endpoint)
-        return [r.status_code, r.content]
+        response = self.request(method, endpoint)
+        if response.status_code == 200 and response.headers['Content-Type'].startswith("multipart/"):
+            meta, filebytes = decoder.MultipartDecoder.from_response(response).parts
+            return [
+                response.status_code,
+                json.loads(meta.content.decode('utf-8')),
+                filebytes.content]
+        else:
+            return [response.status_code, response.content]
 
     def delete_attachment(self, attachmentId):
         """Deletes requested attachment
