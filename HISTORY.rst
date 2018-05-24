@@ -2,6 +2,13 @@
 History
 =======
 
+0.2.1 (2018-05-24)
+------------------
+
+* Fix get_invoices and get_ledger_receipts
+* Return attachment data parsed
+
+
 0.2.0 (2018-05-16)
 ------------------
 
