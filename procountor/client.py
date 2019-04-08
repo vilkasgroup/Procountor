@@ -94,9 +94,9 @@ class Client(ApiMethods):
             "client_id": self.client_id,
             "state": '123456',  # state parameter may be chosen arbitrarily or omitted
         }
-        
-        url = '{}oauth/authz/?{}'.format(self.api_url, self._dict_to_url_query(url_params))
-        
+
+        url = '{}oauth/authz/{}'.format(self.api_url, self._dict_to_url_query(url_params))
+
         response = requests.post(url, params=params, headers=headers, allow_redirects=False)
 
         # have to get value of query parameter named 'code'
