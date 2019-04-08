@@ -1,7 +1,6 @@
 import unittest
 import os
 from tests import TestClient
-from pprint import pprint
 
 
 class TestClientBankStatements(TestClient):

@@ -1,7 +1,6 @@
 import unittest
 import os
 from tests import TestClient
-from pprint import pprint
 
 
 class TestClientBusinessPartners(TestClient):
@@ -22,7 +21,7 @@ class TestClientBusinessPartners(TestClient):
         if self.__class__.test_partner_id:
             response = self.client.get_business_partner(self.__class__.test_partner_id)
             self.assertEqual(response['status'], 200)
-            self.assertEqual(response['content']['id'], self.__class__.test_partner_id)
+            self.assertEqual(response['content']['id'], int(self.__class__.test_partner_id))
 
     def test_003_update_business_partner(self):
         # TODO: Create tests for update business partner
