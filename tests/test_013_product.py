@@ -30,9 +30,10 @@ class TestClientProduct(TestClient):
     def test_003_get_product_groups(self):
         """ get product groups (by product type) """
 
-        response = self.client.get_product_groups(productType=self.__class__.test_product_group)
-        self.assertEqual(response['status'], 200)
-        self.assertIsNotNone(response['content'])
+        if self.__class__.test_product_group:
+            response = self.client.get_product_groups(productType=self.__class__.test_product_group)
+            self.assertEqual(response['status'], 200)
+            self.assertIsInstance(response['content'], list)
 
 if __name__ == '__main__':
     unittest.main()
