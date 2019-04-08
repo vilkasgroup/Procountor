@@ -1,6 +1,5 @@
 import unittest
 from tests import TestClient
-from pprint import pprint
 
 
 class TestClientBankAccounts(TestClient):
@@ -11,7 +10,6 @@ class TestClientBankAccounts(TestClient):
     def test_001_get_bank_accounts(self):
         """ Test getting bank accounts from API """
         response = self.client.get_bank_accounts()
-        pprint(response)
         self.assertEqual(response['status'], 200)
         self.assertIsNotNone(response['content'])
 

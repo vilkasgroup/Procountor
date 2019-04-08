@@ -4,7 +4,7 @@ from tests import TestClient
 
 class TestClientCurrencies(TestClient):
 
-    """
+    """ rate_type value
      1 - Procountor Accounting Exchange Rate
      2 - Average Rate
      3 - Buy Rate
@@ -41,7 +41,7 @@ class TestClientCurrencies(TestClient):
         self.assertEqual(response['content']['currency'], 'EUR')
 
     def test_004_get_latest_currency_rate(self):
-        response = self.client.get_latest_currency_rate(self.__class__.rate_type)
+        response = self.client.get_latest_currency_rate(rateType=self.__class__.rate_type)
         self.assertEqual(response['status'], 200)
 
 if __name__ == '__main__':

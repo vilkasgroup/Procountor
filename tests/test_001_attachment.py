@@ -38,8 +38,6 @@ class TestClientAttachment(TestClient):
             }
 
             response = self.client.post_attachment(meta, f.name)
-            from pprint import pprint
-            pprint(response)
 
             self.assertEqual(response['status'], 200)
             attachmentId = response['content']['id']
