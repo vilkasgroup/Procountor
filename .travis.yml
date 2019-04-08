@@ -42,6 +42,7 @@ deploy:
     python: 2.7
     repo: vilkasgroup/Procountor
     tags: true
+    all_branches: true
 
 after_success:
   - coverage run --source procountor setup.py test
