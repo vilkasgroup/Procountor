@@ -2,6 +2,11 @@
 History
 =======
 
+1.0.0 (2019-04-21)
+
+* Version 1.0.0 is compatibled with Procountor API version 10.
+* Returns response as dict with keys: status, message and data
+
 0.2.1 (2018-05-24)
 ------------------
 
