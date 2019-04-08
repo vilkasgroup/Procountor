@@ -207,7 +207,6 @@ class Client(ApiMethods):
         """
         headers = headers or self._headers(method, endpoint)
         url = url or self.api_url + endpoint
-        print(url)
 
         response = requests.request(method, url, headers=headers, files=files, json=kwargs)
 
