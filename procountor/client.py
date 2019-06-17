@@ -28,7 +28,10 @@ class Client(ApiMethods):
     _api_host = "https://api.procountor.com"
     _test_api_host = "https://api-test.procountor.com"
 
-    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri, test_mode=True):
+    _api_host_version = "https://api.procountor.com/procountor.api.v{}"
+    _test_api_host_version = "https://api-test.procountor.com/procountor.api.v{}"
+
+    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri, test_mode=True, api_version=None):
         self.username = username
         self.password = password
         self.company_id = company_id
@@ -36,6 +39,7 @@ class Client(ApiMethods):
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
         self.test_mode = test_mode
+        self.api_version = api_version
         self._get_tokens()
 
     @property
@@ -44,10 +48,16 @@ class Client(ApiMethods):
 
     @property
     def api_host(self):
-        if self.test_mode is True:
-            return Client._test_api_host
-        elif self.test_mode is False:
-            return Client._api_host
+        if self.test_mode:
+            if self.api_version:
+                return Client._test_api_host_version.format(self.api_version)
+            else:
+                return Client._test_api_host
+        else: # Production
+            if self.api_version:
+                return Client._api_host_version.format(self.api_version)
+            else:
+                return Client._api_host
 
     def _create_endpoint(self, endpoint, queries={}):
         """

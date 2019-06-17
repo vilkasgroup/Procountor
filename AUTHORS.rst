@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-* Joonas Maliniemi <joonas@vilkas.fi>
+* Tero Kotti <tero@vilkas.fi>
 
 Contributors
 ------------
