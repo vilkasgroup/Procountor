@@ -2,6 +2,9 @@
 History
 =======
 
+1.1.0 (2019-06-17)
+* Support to use a specified version of Procountor API
+
 1.0.0 (2019-04-21)
 
 * Version 1.0.0 is compatibled with Procountor API version 10.
