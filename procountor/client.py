@@ -1,4 +1,5 @@
 import json
+import re
 import requests
 from requests_toolbelt.multipart import decoder
 try:
@@ -23,15 +24,22 @@ class Client(ApiMethods):
     :param client_secret: Procountor REST API client secret, string
     :param redirect_uri: URI where redirected after authentication, string
     :param test_mode: Wether to use test api or real api, bool
+    :param api_version: Cen be latest, supported or >= 20.01, string
     """
 
-    _api_host = "https://api.procountor.com"
-    _test_api_host = "https://api-test.procountor.com"
+    _endpoints = {
+        'hosts' : {
+            'production': "https://api.procountor.com",
+            'test': "https://api-test.procountor.com",
+        },
+        'version' : {
+            'latest': "latest/api",
+            'supported': "supported/api",
+            'specified': "v{}/api",
+        }
+    }
 
-    _api_host_version = "https://api.procountor.com/procountor.api.v{}"
-    _test_api_host_version = "https://api-test.procountor.com/procountor.api.v{}"
-
-    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri, test_mode=True, api_version=None):
+    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri, test_mode=True, api_version='supported'):
         self.username = username
         self.password = password
         self.company_id = company_id
@@ -44,20 +52,21 @@ class Client(ApiMethods):
 
     @property
     def api_url(self):
-        return self.api_host + "/api/"
+
+        if self.api_version in ['latest', 'supported']:
+            version = Client._endpoints['version'][self.api_version]
+        elif re.match("^[0-9]{2}\.[0-9]{2}$", self.api_version):
+            version_number = "{}{}".format(self.api_version[0:2], self.api_version[3:5])
+            version = Client._endpoints['version']['specified'].format(version_number)
+        else:
+            raise ValueError("Given api version {} is not valid.".format(self.api_version)) 
+
+        return "{}/{}/".format(self.api_host, version)
 
     @property
     def api_host(self):
-        if self.test_mode:
-            if self.api_version:
-                return Client._test_api_host_version.format(self.api_version)
-            else:
-                return Client._test_api_host
-        else: # Production
-            if self.api_version:
-                return Client._api_host_version.format(self.api_version)
-            else:
-                return Client._api_host
+        host = Client._endpoints['hosts']['test' if self.test_mode else 'production']
+        return host
 
     def _create_endpoint(self, endpoint, queries={}):
         """
