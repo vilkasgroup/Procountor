@@ -55,11 +55,11 @@ class Client(ApiMethods):
 
         if self.api_version in ['latest', 'supported']:
             version = Client._endpoints['version'][self.api_version]
-        elif re.match("^[0-9]{2}\.[0-9]{2}$", self.api_version):
+        elif re.match("^2[0-9]\.[0-9]{2}$", self.api_version):
             version_number = "{}{}".format(self.api_version[0:2], self.api_version[3:5])
             version = Client._endpoints['version']['specified'].format(version_number)
         else:
-            raise ValueError("Given api version {} is not valid.".format(self.api_version)) 
+            raise ValueError("Given value for api version {} is not valid. Valid values are latest, supported or Api version >= 20.01".format(self.api_version)) 
 
         return "{}/{}/".format(self.api_host, version)
 
