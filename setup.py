@@ -38,6 +38,7 @@ setup(
     license="MIT license",
     zip_safe=False,
     keywords='procountor',
+    long_description_content_type='text/markdown',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
