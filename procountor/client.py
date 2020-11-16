@@ -17,9 +17,7 @@ class Client(ApiMethods):
     Following packages need to be installed:
      - requests
 
-    :param username: Procountor username, string
-    :param password: Procountor password, string
-    :param company_id: Procountor environment company id, string
+    :param api_key: Procountor API Key, string
     :param client_id: Procountor REST API client id, string
     :param client_secret: Procountor REST API client secret, string
     :param redirect_uri: URI where redirected after authentication, string
@@ -120,29 +118,6 @@ class Client(ApiMethods):
         r = requests.post(self.api_url + 'oauth/token/', params=params, headers=headers)
 
         self.access_token = r.json()['access_token']
-
-        return self.access_token
-
-    def refresh_access_token(self):
-        """If the access token is expired (3600 seconds), new access token is granted with refresh token
-
-        :param refresh_token: token to get new access token, string
-        :return: refreshed access_token, string
-        """
-
-        params = {
-            'grant_type': 'refresh_token',
-            'refresh_token': self.refresh_token,
-            'client_id': self.client_id,
-            'client_secret': self.client_secret,
-        }
-
-        headers = {
-            'content-type': 'application/x-www-form-urlencoded'
-        }
-
-        r = requests.post(self.api_url + 'oauth/token/', params=params, headers=headers)
-        self.access_token = r.json().get('access_token')
 
         return self.access_token
 
