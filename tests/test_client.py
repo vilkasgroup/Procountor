@@ -22,7 +22,7 @@ class TestClient(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         """ Initialize Procountor client. Requires the following environment
-        variables PROCOUNTOR_USERNAME, PROCOUNTOR_PASSWORD, PROCOUNTOR_COMPANY_ID, PROCOUNTOR_CLIENT_ID, PROCOUNTOR_CLIENT_SECRET and PROCOUNTOR_REDIRECT_URI. """
+        variables PROCOUNTOR_API_KEY, PROCOUNTOR_CLIENT_ID, PROCOUNTOR_CLIENT_SECRET, PROCOUNTOR_REDIRECT_URI and PROCOUNTOR_API_VERSION. """
 
         super(TestClient, self).__init__(*args, **kwargs)
         self.client = Client(
