@@ -39,16 +39,14 @@ class Client(ApiMethods):
         }
     }
 
-    def __init__(self, username, password, company_id, client_id, client_secret, redirect_uri, test_mode=True, api_version='supported'):
-        self.username = username
-        self.password = password
-        self.company_id = company_id
+    def __init__(self, api_key, client_id, client_secret, redirect_uri, test_mode=True, api_version='supported'):
+        self.api_key = api_key,
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
         self.test_mode = test_mode
         self.api_version = api_version
-        self._get_tokens()
+        self._get_token()
 
     @property
     def api_url(self):
@@ -88,45 +86,6 @@ class Client(ApiMethods):
         else:
             raise Exception("Given params are not dict. The type was {}".format(type(url_dict)))
 
-    def _get_auth_code(self):
-        """Makes post request and returns authorization code which is used for getting access token and refresh token
-
-        :return: auth_code, string or raise error if delentians are not corrects
-        """
-
-        params = {
-            'response_type': 'code',
-            'username': self.username,
-            'password': self.password,
-            'company': self.company_id,
-            'redirect_uri': self.redirect_uri,
-        }
-
-        headers = {
-            'content-type': 'application/x-www-form-urlencoded'
-        }
-
-        auth_code = None
-
-        url_params = {
-            "response_type": 'code',
-            "client_id": self.client_id,
-            "state": '123456',  # state parameter may be chosen arbitrarily or omitted
-        }
-
-        url = '{}oauth/authz/{}'.format(self.api_url, self._dict_to_url_query(url_params))
-
-        response = requests.post(url, params=params, headers=headers, allow_redirects=False)
-
-        # have to get value of query parameter named 'code'
-        if response.status_code == 302:
-            auth_code = parse_qs(urlparse(response.headers['Location']).query)['code'][0]
-        else:
-            messages = response.json()
-            raise Exception(messages['error_description'])
-
-        return auth_code
-
     def invalidate_token(self):
         """Method invalidates the access token"""
 
@@ -139,21 +98,19 @@ class Client(ApiMethods):
 
         return self.request(method, endpoint, headers, url)
 
-    def _get_tokens(self):
-        """Makes a request and returns access token and refresh token for coming requests. Access token is valid for
-        3600 seconds and has to be refreshed after that with refresh token. Refresh token is valid always.
+    def _get_token(self):
+        """Makes a request and returns an access token. Access token is valid for
+        3600 seconds.
 
         :return: granted tokens, dict
         """
 
-        auth_code = self._get_auth_code()
-
         params = {
-            'grant_type': 'authorization_code',
-            'redirect_uri': self.redirect_uri,
-            'code': auth_code,
+            'grant_type': 'client_credentials',
             'client_id': self.client_id,
             'client_secret': self.client_secret,
+            'redirect_uri': self.redirect_uri,
+            'api_key': self.api_key
         }
 
         headers = {
@@ -163,10 +120,8 @@ class Client(ApiMethods):
         r = requests.post(self.api_url + 'oauth/token/', params=params, headers=headers)
 
         self.access_token = r.json()['access_token']
-        self.refresh_token = r.json()['refresh_token']
 
-        tokens = {'access_token': self.access_token, 'refresh_token': self.refresh_token}
-        return tokens
+        return self.access_token
 
     def refresh_access_token(self):
         """If the access token is expired (3600 seconds), new access token is granted with refresh token
@@ -231,7 +186,7 @@ class Client(ApiMethods):
 
         # refresh token if out of date
         if response.status_code == 401:
-            self.access_token = self.refresh_access_token()
+            self.access_token = self._get_token()
             response = requests.request(method, url, headers=headers, files=files, json=kwargs)
 
         return self._handleResponse(response)
