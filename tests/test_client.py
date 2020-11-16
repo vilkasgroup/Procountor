@@ -26,13 +26,12 @@ class TestClient(unittest.TestCase):
 
         super(TestClient, self).__init__(*args, **kwargs)
         self.client = Client(
-            username = os.environ['PROCOUNTOR_USERNAME'],
-            password = os.environ['PROCOUNTOR_PASSWORD'],
-            company_id = os.environ['PROCOUNTOR_COMPANY_ID'],
+            api_key = os.environ['PROCOUNTOR_API_KEY'],
             client_id = os.environ['PROCOUNTOR_CLIENT_ID'],
             client_secret = os.environ['PROCOUNTOR_CLIENT_SECRET'],
             redirect_uri = os.environ['PROCOUNTOR_REDIRECT_URI'],
             test_mode = True,
+            api_version = os.environ['PROCOUNTOR_API_VERSION']
         )
 
 if __name__ == '__main__':
