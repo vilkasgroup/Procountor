@@ -1,7 +1,6 @@
 import json
 import re
 import requests
-from requests.models import Response
 from requests_toolbelt.multipart import decoder
 try:
     from urllib.parse import urlparse, parse_qs, urlencode
