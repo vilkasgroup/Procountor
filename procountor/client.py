@@ -134,7 +134,7 @@ class Client(ApiMethods):
         access_token = json_content.get('access_token', None)
 
         if access_token is None:
-            raise RuntimeError("Cannot read the access_token from the response.")
+            raise RuntimeError("Cannot read the access_token from the response. Response was: " + json_content)
 
         self.access_token = access_token
         return access_token
