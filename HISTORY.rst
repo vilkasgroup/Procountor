@@ -2,6 +2,11 @@
 History
 =======
 
+2.2.1 (2021-11-15)
+------------------
+
+* Better API Token error message if getting token fails
+
 1.2.0 (2020-04-08)
 ------------------
 
