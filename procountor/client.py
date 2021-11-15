@@ -1,6 +1,7 @@
 import json
 import re
 import requests
+from requests.models import Response
 from requests_toolbelt.multipart import decoder
 try:
     from urllib.parse import urlparse, parse_qs, urlencode
@@ -100,7 +101,7 @@ class Client(ApiMethods):
         """Makes a request and returns an access token. Access token is valid for
         3600 seconds.
 
-        :return: granted tokens, dict
+        :return: granted tokens, str
         """
 
         params = {
@@ -115,11 +116,29 @@ class Client(ApiMethods):
             'content-type': 'application/x-www-form-urlencoded'
         }
 
-        r = requests.post(self.api_url + 'oauth/token/', params=params, headers=headers)
+        url = self.api_url + 'oauth/token/'
+        response = requests.post(url, params=params, headers=headers)
+        status_code = response.status_code
 
-        self.access_token = r.json()['access_token']
+        if status_code != 200:
 
-        return self.access_token
+            if status_code == 404:
+                raise RuntimeError("Not found api endpoint. Please, check your API version.")
+
+            if status_code == 401:
+                raise RuntimeError("Authentication failed. Please, check your credentials.")
+
+            raise RuntimeError("Authentication got an unexpected HTTP Status code: " + status_code + ".")
+
+        json_content = response.json()
+
+        access_token = json_content.get('access_token', None)
+
+        if access_token is None:
+            raise RuntimeError("Cannot read the access_token from the response.")
+
+        self.access_token = access_token
+        return access_token
 
     def _handleResponse(self, response):
         """
