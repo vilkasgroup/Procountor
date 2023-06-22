@@ -199,15 +199,19 @@ class Client(ApiMethods):
         headers = headers or self._headers(method, endpoint)
         url = url or self.api_url + endpoint
 
+        # Test environment (Microsoft-Azure-Application-Gateway)
+        # doesn't like if there is a json body in (for ex.) GET method.
+        json = None if len(kwargs) == 0 else kwargs
+
         response = requests.request(
-            method, url, headers=headers, files=files, json=kwargs
+            method, url, headers=headers, files=files, json=json
         )
 
         # refresh token if out of date
         if response.status_code == 401:
             self.access_token = self._get_token()
             response = requests.request(
-                method, url, headers=headers, files=files, json=kwargs
+                method, url, headers=headers, files=files, json=json
             )
 
         return self._handleResponse(response)
