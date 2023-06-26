@@ -48,7 +48,7 @@ Tag master branch with the current version number
 
 ```
 git tag vX.X.X
-git push tags
+git push --tags
 ```
 
 Double check that the github action runs successfully.
