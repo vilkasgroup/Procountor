@@ -37,3 +37,18 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
+
+Releasing new version to pypi
+---------
+
+Double check that everything works. Remember to up version numbers and update `HISTORY.rst`.
+
+Tag master branch with the current version number
+
+```
+git tag vX.X.X
+git push tags
+```
+
+Double check that the github action runs successfully.

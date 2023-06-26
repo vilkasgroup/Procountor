@@ -2,6 +2,13 @@
 History
 =======
 
+2.3.1 (2022-06-26)
+------------------
+
+* Don't send empty json body in get requests
+  * fixes problem with azure api gateway rejecting messages
+* remove travis
+
 2.2.1 (2021-11-15)
 ------------------
 
