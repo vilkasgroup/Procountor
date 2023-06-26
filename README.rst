@@ -56,10 +56,10 @@ Bump version. (patch | minor | major depending on the scale of changes)
 bumpversion patch
 ```
 
-Tag master branch with the current version number
+Push changes and tags.
 
 ```
-git tag vX.X.X
+git push
 git push --tags
 ```
 
