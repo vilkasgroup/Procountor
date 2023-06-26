@@ -4,13 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
-
-[packages]
-requests = "*"
 tox = "*"
 sphinx = "*"
 bumpversion = "*"
+
+[packages]
+requests = "*"
 requests-toolbelt = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
