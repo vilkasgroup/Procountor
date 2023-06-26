@@ -2,6 +2,11 @@
 History
 =======
 
+2.3.2 (2022-06-26)
+------------------
+
+* up version number to test new release process
+
 2.3.1 (2022-06-26)
 ------------------
 

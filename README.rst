@@ -42,7 +42,19 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 Releasing new version to pypi
 ---------
 
-Double check that everything works. Remember to up version numbers and update `HISTORY.rst`.
+Install dev tools
+
+```
+pipenv install --dev
+```
+
+Update `HISTORY.rst` and commit the changes.
+
+Bump version.
+
+```
+bumpversion patch --dry-run
+```
 
 Tag master branch with the current version number
 
