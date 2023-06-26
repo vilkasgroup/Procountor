@@ -50,10 +50,10 @@ pipenv install --dev
 
 Update `HISTORY.rst` and commit the changes.
 
-Bump version.
+Bump version. (patch | minor | major depending on the scale of changes)
 
 ```
-bumpversion patch --dry-run
+bumpversion patch
 ```
 
 Tag master branch with the current version number
