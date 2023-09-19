@@ -126,7 +126,7 @@ class Client(ApiMethods):
         headers = {"content-type": "application/x-www-form-urlencoded"}
 
         url = self.api_url + "oauth/token/"
-        response = requests.post(url, params=params, headers=headers)
+        response = requests.post(url, data=params, headers=headers)
         status_code = response.status_code
 
         if status_code != 200:
@@ -142,8 +142,8 @@ class Client(ApiMethods):
 
             raise RuntimeError(
                 "Authentication got an unexpected HTTP Status code: "
-                + status_code
-                + "."
+                + str(status_code)
+                + ". Content: " + response.text
             )
 
         json_content = response.json()
