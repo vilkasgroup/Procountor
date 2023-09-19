@@ -4,4 +4,4 @@
 
 __author__ = """Joonas Maliniemi, Tero Kotti"""
 __email__ = 'joonas@vilkas.fi, tero@vilkas.fi'
-__version__ = '2.3.2'
+__version__ = '2.3.3'
