@@ -2,6 +2,11 @@
 History
 =======
 
+2.5.0 (2025-07-31)
+------------------
+
+* Update client to use environment variables for endpoint hosts and updated default test url
+
 2.3.2 (2022-06-26)
 ------------------
 
