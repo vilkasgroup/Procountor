@@ -1,3 +1,4 @@
+import os
 import json
 import re
 import requests
@@ -28,8 +29,8 @@ class Client(ApiMethods):
 
     _endpoints = {
         "hosts": {
-            "production": "https://api.procountor.com",
-            "test": "https://pts-procountor.pubdev.azure.procountor.com",
+            "production": os.getenv("PROCOUNTOR_HOST_PRODUCTION", "https://api.procountor.com"),
+            "test": os.getenv("PROCOUNTOR_HOST_TEST", "https://pts-api.procountor.com"),
         },
         "version": {
             "latest": "latest/api",
