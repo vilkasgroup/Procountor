@@ -60,7 +60,7 @@ class Client(ApiMethods):
     def api_url(self):
         if self.api_version in ["latest", "supported"]:
             version = Client._endpoints["version"][self.api_version]
-        elif re.match("^2[0-9]\.[0-9]{2}$", self.api_version):
+        elif re.match(r"^2[0-9]\.[0-9]{2}$", self.api_version):
             version_number = "{}{}".format(self.api_version[0:2], self.api_version[3:5])
             version = Client._endpoints["version"]["specified"].format(version_number)
         else:
