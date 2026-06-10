@@ -279,28 +279,16 @@ class ApiMethods(BaseClient):
 
         return self.get(endpoint)
 
-    def update_dimension(self, **kwargs: Any) -> ResponseDict:
-        """Update dimension
+    def update_dimension(self, dimensionId: int, **data: Any) -> ResponseDict:
+        """Update a dimension.
 
-        .. deprecated::
-            This PUTs to ``/dimensions``, which the current Procountor API no
-            longer accepts. Use ``PUT /dimensions/{dimensionId}`` instead, e.g.
-            ``client.put("dimensions/{}".format(dimension_id), json=dimension)``.
-
-        :param body: Dimension object
-
+        :param dimensionId: dimension identifier, integer
+        :param **data: Dimension object
         :return: Dictionary with keys: status and content, dict
         """
-        warnings.warn(
-            "update_dimension targets PUT /dimensions, which no longer exists "
-            "in the Procountor API. Use client.put('dimensions/<id>', json=...) "
-            "instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
 
-        endpoint = "dimensions"
-        return self.put(endpoint, json=kwargs)
+        endpoint = "dimensions/{}".format(dimensionId)
+        return self.put(endpoint, json=data)
 
     def get_dimension(self, dimensionId: int) -> ResponseDict:
         """Gets and returns a specified dimension with its dimension items

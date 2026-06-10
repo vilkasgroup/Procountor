@@ -151,10 +151,8 @@ class WriteBodyDelegationTests(unittest.TestCase):
         self.assert_body_forwarded("PUT", "businesspartners/42", name="Acme Oy")
 
     def test_update_dimension_sends_body(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            self.client.update_dimension(id=1, name="Cost center")
-        self.assert_body_forwarded("PUT", "dimensions", id=1, name="Cost center")
+        self.client.update_dimension(1, name="Cost center")
+        self.assert_body_forwarded("PUT", "dimensions/1", name="Cost center")
 
     def test_create_dimension_item_sends_body(self):
         self.client.create_dimension_item(1, name="Item")
@@ -228,10 +226,6 @@ class DeprecatedMethodTests(unittest.TestCase):
         )
         patcher.start()
         self.addCleanup(patcher.stop)
-
-    def test_update_dimension_warns(self):
-        with self.assertWarns(DeprecationWarning):
-            self.client.update_dimension(id=1)
 
     def test_pay_invoice_warns(self):
         with self.assertWarns(DeprecationWarning):

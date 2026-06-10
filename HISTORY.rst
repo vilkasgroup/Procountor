@@ -17,9 +17,12 @@ Unreleased
   accepts an explicit ``json`` body, allowing top-level JSON array payloads.
   The named helper methods are now thin wrappers over these verbs (no
   behavioural change to what they send).
-* **Deprecated**: ``pay_invoice``, ``send_one_time_pass`` and
-  ``update_dimension`` now emit a ``DeprecationWarning``; their endpoints no
-  longer exist in the current Procountor API.
+* **Changed**: ``update_dimension`` now takes a ``dimensionId`` argument and
+  targets ``PUT /dimensions/{dimensionId}``. The previous ``PUT /dimensions``
+  endpoint was removed by Procountor (around version 25.11).
+* **Deprecated**: ``pay_invoice`` and ``send_one_time_pass`` now emit a
+  ``DeprecationWarning``; their endpoints no longer exist in the current
+  Procountor API.
 * **Fixed**: ``get_payments`` queried the ``invoices`` endpoint instead of
   ``payments``.
 * **Fixed**: ``create_dimension_item``, ``update_dimension_item`` and
