@@ -313,7 +313,7 @@ class ApiMethods(BaseClient):
         """
 
         method = "POST"
-        endpoint ="/dimensions/{}/items".format(dimensionId)
+        endpoint = "dimensions/{}/items".format(dimensionId)
 
         return self.request(method, endpoint, **data)
 
@@ -325,7 +325,7 @@ class ApiMethods(BaseClient):
         """
 
         method = "PUT"
-        endpoint ="/dimensions/{}/items".format(dimensionId)
+        endpoint = "dimensions/{}/items".format(dimensionId)
 
         return self.request(method, endpoint, **data)
 
@@ -524,7 +524,7 @@ class ApiMethods(BaseClient):
         """
 
         method = "PUT"
-        endpoint = "/invoices/{}/confirm".format(transactionId)
+        endpoint = "invoices/{}/confirm".format(transactionId)
 
         return self.request(method, endpoint)
 
@@ -618,7 +618,7 @@ class ApiMethods(BaseClient):
         """
 
         method = "GET"
-        endpoint = self._create_endpoint("invoices", kwargs)
+        endpoint = self._create_endpoint("payments", kwargs)
 
         return self.request(method, endpoint)
 

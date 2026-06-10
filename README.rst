@@ -22,6 +22,41 @@ Features
 
 * Full client for calling Procountor REST API
 
+Installation
+------------
+
+::
+
+    pip install Procountor
+
+Usage
+-----
+
+Create a client and call the API. The client fetches an access token on
+construction, so creating it requires valid credentials.
+
+.. code-block:: python
+
+    from procountor import Client
+
+    client = Client(
+        api_key="your-api-key",
+        client_id="your-client-id",
+        client_secret="your-client-secret",
+        redirect_uri="https://your-app.example.com/callback",
+        test_mode=True,          # talk to the Procountor test API
+        api_version="supported",  # "latest", "supported" or e.g. "20.01"
+    )
+
+    # Every method returns a dict with a "status" key and, on success, "content".
+    response = client.get_invoices(startDate="2024-01-01", endDate="2024-01-31")
+    if response["status"] == 200:
+        for invoice in response["content"]["results"]:
+            print(invoice["id"])
+
+    # Fetch a single invoice
+    invoice = client.get_invoice(8204221)
+
 Credits
 ---------
 

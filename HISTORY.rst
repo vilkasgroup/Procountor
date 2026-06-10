@@ -11,6 +11,11 @@ Unreleased
   ``payments_direct_bank_transfers``) passed the request body into the
   ``headers`` argument, so no JSON body was ever sent. They now forward the body
   correctly. This changes what these methods send on the wire.
+* **Fixed**: ``get_payments`` queried the ``invoices`` endpoint instead of
+  ``payments``.
+* **Fixed**: ``create_dimension_item``, ``update_dimension_item`` and
+  ``confirm_invoice`` produced URLs with a double slash because of a leading
+  slash in the endpoint path.
 * Added type hints throughout the package and a ``py.typed`` marker so the
   types are exposed to downstream users. The client is now split into a
   ``BaseClient`` (HTTP transport) and the ``ApiMethods`` endpoint helpers;

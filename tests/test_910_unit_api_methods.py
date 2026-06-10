@@ -74,9 +74,18 @@ class ApiMethodDelegationTests(unittest.TestCase):
         self.client.get_invoices(startDate="2024-01-01")
         self.assert_called_with_positional("GET", "invoices?startDate=2024-01-01")
 
+    def test_get_payments_uses_payments_endpoint(self):
+        # Regression: this used to query the "invoices" endpoint by mistake.
+        self.client.get_payments(startDate="2024-01-01")
+        self.assert_called_with_positional("GET", "payments?startDate=2024-01-01")
+
     def test_get_payment(self):
         self.client.get_payment(99)
         self.assert_called_with_positional("GET", "payments/99")
+
+    def test_confirm_invoice_endpoint_has_no_leading_slash(self):
+        self.client.confirm_invoice(7)
+        self.assert_called_with_positional("PUT", "invoices/7/confirm")
 
     def test_delete_payment(self):
         self.client.delete_payment(99)
@@ -144,11 +153,11 @@ class WriteBodyDelegationTests(unittest.TestCase):
 
     def test_create_dimension_item_sends_body(self):
         self.client.create_dimension_item(1, name="Item")
-        self.assert_body_forwarded("POST", "/dimensions/1/items", name="Item")
+        self.assert_body_forwarded("POST", "dimensions/1/items", name="Item")
 
     def test_update_dimension_item_sends_body(self):
         self.client.update_dimension_item(1, name="Item")
-        self.assert_body_forwarded("PUT", "/dimensions/1/items", name="Item")
+        self.assert_body_forwarded("PUT", "dimensions/1/items", name="Item")
 
     def test_post_payment_sends_body(self):
         self.client.post_payment(payments=[{"id": 1}])
