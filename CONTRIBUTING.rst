@@ -64,11 +64,11 @@ Ready to contribute? Here's how to set up `Procountor` for local development.
 
     $ git clone git@github.com:vilkasgroup/Procountor.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Install your local copy with `uv <https://docs.astral.sh/uv/>`_, which
+   creates the virtual environment for you::
 
-    $ mkvirtualenv Procountor
     $ cd Procountor/
-    $ python setup.py develop
+    $ uv sync
 
 4. Create a branch for local development::
 
@@ -76,13 +76,11 @@ Ready to contribute? Here's how to set up `Procountor` for local development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass the linter and
+   the tests::
 
-    $ flake8 procountor tests
-    $ python setup.py test or py.test
-    $ tox
-
-   To get flake8 and tox, just pip install them into your virtualenv.
+    $ uv run ruff check procountor tests
+    $ uv run pytest
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -101,16 +99,16 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 2.7 and 3.6, and for PyPy. Check
-   https://travis-ci.org/vilkasgroup/Procountor/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+3. The pull request should work for all supported Python versions (3.9+).
+   The GitHub Actions CI workflow runs the linter and the test matrix on every
+   pull request; make sure it is green.
 
 Tips
 ----
 
 To run a subset of tests::
 
-    $ python -m unittest tests.test_client
+    $ uv run pytest tests/test_900_unit_client.py
 
 
 Releasing new version
@@ -124,11 +122,11 @@ When you are ready to release a new version follow these steps:
    changes to master.
 3. run::
 
-    $ bumpversion patch|minor|major
+    $ uv run bump-my-version bump patch|minor|major
 
-4. push to master with tags to trigger travis deploy::
+4. push to master with tags to trigger the publish workflow::
 
     $ git push --tags
     $ git push
 
-Travis will build the tag and when it is successfull will also deploy to pypi
+The GitHub Action will build the tag and, when successful, deploy to PyPI.

@@ -73,11 +73,13 @@ class Client(ApiMethods):
         host = Client._endpoints["hosts"]["test" if self.test_mode else "production"]
         return host
 
-    def _create_endpoint(self, endpoint, queries={}):
+    def _create_endpoint(self, endpoint, queries=None):
         """
 
         :return: url, string
         """
+        if queries is None:
+            queries = {}
         return "{}{}".format(endpoint, self._dict_to_url_query(queries))
 
     def _dict_to_url_query(self, url_dict):
