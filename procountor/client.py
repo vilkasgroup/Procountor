@@ -44,7 +44,7 @@ class Client(ApiMethods):
         test_mode=True,
         api_version="supported",
     ):
-        self.api_key = (api_key,)
+        self.api_key = api_key
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
