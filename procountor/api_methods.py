@@ -2,9 +2,22 @@ from __future__ import annotations
 
 import json
 import warnings
+from datetime import date
 from typing import Any
 
 from .transport import BaseClient, ResponseDict
+
+
+def _as_date_string(value: str | date) -> str:
+    """Format a date-only parameter as ``yyyy-MM-dd``.
+
+    Accepts a ``date``/``datetime`` (truncated to its date) or an
+    already-formatted string, so callers can pass either. Procountor expects
+    date-only parameters in ``yyyy-MM-dd`` form.
+    """
+    if isinstance(value, date):  # also matches datetime, which subclasses date
+        return value.strftime("%Y-%m-%d")
+    return value
 
 
 class ApiMethods(BaseClient):
@@ -74,18 +87,18 @@ class ApiMethods(BaseClient):
         return self.get(endpoint)
 
     # BANK STATEMENTS
-    def get_bank_statements(self, startDate: str, endDate: str) -> ResponseDict:
+    def get_bank_statements(self, startDate: str | date, endDate: str | date) -> ResponseDict:
         """Gets and returns all bank statements that match the request criteria. Each BankStatementEvent can have a
         list of child events. In that case, the event model contains an additional "event" property with an array of
         BankStatementEvents as its value.
 
-        :param startDate: Start date of the search (yyyy-MM-dd), string
-        :param endDate: End date of the search (yyyy-MM-dd), string
+        :param startDate: Start date of the search, ``yyyy-MM-dd`` string or a date/datetime
+        :param endDate: End date of the search, ``yyyy-MM-dd`` string or a date/datetime
         :return: Dictionary with keys: status and content, dict
         """
         dates = {
-            'startDate': startDate,
-            'endDate': endDate,
+            'startDate': _as_date_string(startDate),
+            'endDate': _as_date_string(endDate),
         }
         endpoint = self._create_endpoint("bankstatements", dates)
 

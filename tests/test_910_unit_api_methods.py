@@ -175,6 +175,49 @@ class WriteBodyDelegationTests(unittest.TestCase):
         )
 
 
+class DateParameterTests(unittest.TestCase):
+    """Date-only parameters accept strings as well as date/datetime objects."""
+
+    def setUp(self):
+        self.client = build_mock_client()
+        patcher = mock.patch.object(
+            self.client, "request", return_value={"status": 200, "content": {}}
+        )
+        self.mock_request = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _endpoint(self):
+        args, _ = self.mock_request.call_args
+        return args[1]
+
+    def test_string_dates_are_passed_through(self):
+        self.client.get_bank_statements("2024-01-01", "2024-01-31")
+        self.assertEqual(
+            self._endpoint(),
+            "bankstatements?startDate=2024-01-01&endDate=2024-01-31",
+        )
+
+    def test_date_objects_are_formatted(self):
+        from datetime import date
+
+        self.client.get_bank_statements(date(2024, 1, 1), date(2024, 1, 31))
+        self.assertEqual(
+            self._endpoint(),
+            "bankstatements?startDate=2024-01-01&endDate=2024-01-31",
+        )
+
+    def test_datetime_is_truncated_to_date(self):
+        from datetime import datetime
+
+        self.client.get_bank_statements(
+            datetime(2024, 1, 1, 13, 30, 0), datetime(2024, 1, 31, 9, 0, 0)
+        )
+        self.assertEqual(
+            self._endpoint(),
+            "bankstatements?startDate=2024-01-01&endDate=2024-01-31",
+        )
+
+
 class DeprecatedMethodTests(unittest.TestCase):
     """Methods that target endpoints removed from the current Procountor API."""
 
