@@ -75,6 +75,13 @@ class ApiMethodDelegationTests(unittest.TestCase):
         self.client.get_invoices(startDate="2024-01-01")
         self.assert_called_with_positional("GET", "invoices?startDate=2024-01-01")
 
+    def test_get_invoice_paymentevents_uses_query_params(self):
+        # Regression: these are query parameters, not a GET request body.
+        self.client.get_invoice_paymentevents(7, size=20, page=2)
+        self.assert_called_with_positional(
+            "GET", "invoices/7/paymentevents?size=20&page=2"
+        )
+
     def test_get_payments_uses_payments_endpoint(self):
         # Regression: this used to query the "invoices" endpoint by mistake.
         self.client.get_payments(startDate="2024-01-01")

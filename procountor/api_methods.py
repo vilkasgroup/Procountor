@@ -421,19 +421,20 @@ class ApiMethods(BaseClient):
 
         return self.post(endpoint, json=data)
 
-    def get_invoice_paymentevents(self, invoiceId: int, **data: Any) -> ResponseDict:
+    def get_invoice_paymentevents(self, invoiceId: int, **kwargs: Any) -> ResponseDict:
         """Get payment events
+
         :param invoiceId: Invoice identifier
         :param previousId: Previous payment event ID for pagination
         :param orderById: Order the results by payment event ID
         :param size: Page size for the results
+        :param page: Page number for the results
         :return: Dictionary with key: status and content, dict
         """
 
-        method = "GET"
-        endpoint = "invoices/{}/paymentevents".format(invoiceId)
+        endpoint = self._create_endpoint("invoices/{}/paymentevents".format(invoiceId), kwargs)
 
-        return self.request(method, endpoint, **data)
+        return self.get(endpoint)
 
     def delete_invoice_paymentevent(self, invoiceId: int, paymentEventId: int) -> ResponseDict:
         """Remove a payment event which is not actually related to paying through the software i.e. with the status 'marked paid'.

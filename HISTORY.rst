@@ -25,6 +25,9 @@ Unreleased
   Procountor API.
 * **Fixed**: ``get_payments`` queried the ``invoices`` endpoint instead of
   ``payments``.
+* **Fixed**: ``get_invoice_paymentevents`` sent its arguments as a JSON body on
+  a GET request; they are query parameters (``previousId``, ``orderById``,
+  ``size``, ``page``) and are now sent as such.
 * **Fixed**: ``create_dimension_item``, ``update_dimension_item`` and
   ``confirm_invoice`` produced URLs with a double slash because of a leading
   slash in the endpoint path.
