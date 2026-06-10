@@ -6,6 +6,7 @@ construction without touching the network.
 """
 
 import unittest
+import warnings
 from unittest import mock
 
 from tests.test_client import build_mock_client
@@ -104,7 +105,9 @@ class ApiMethodDelegationTests(unittest.TestCase):
         self.assert_called_with_positional("GET", "users/profiles/11")
 
     def test_send_one_time_pass(self):
-        self.client.send_one_time_pass()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self.client.send_one_time_pass()
         self.assert_called_with_positional("GET", "users/otp")
 
 
@@ -148,7 +151,9 @@ class WriteBodyDelegationTests(unittest.TestCase):
         self.assert_body_forwarded("PUT", "businesspartners/42", name="Acme Oy")
 
     def test_update_dimension_sends_body(self):
-        self.client.update_dimension(id=1, name="Cost center")
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self.client.update_dimension(id=1, name="Cost center")
         self.assert_body_forwarded("PUT", "dimensions", id=1, name="Cost center")
 
     def test_create_dimension_item_sends_body(self):
@@ -168,6 +173,30 @@ class WriteBodyDelegationTests(unittest.TestCase):
         self.assert_body_forwarded(
             "POST", "payments/directbanktransfers", transfers=[{"id": 1}]
         )
+
+
+class DeprecatedMethodTests(unittest.TestCase):
+    """Methods that target endpoints removed from the current Procountor API."""
+
+    def setUp(self):
+        self.client = build_mock_client()
+        patcher = mock.patch.object(
+            self.client, "request", return_value={"status": 200, "content": {}}
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_update_dimension_warns(self):
+        with self.assertWarns(DeprecationWarning):
+            self.client.update_dimension(id=1)
+
+    def test_pay_invoice_warns(self):
+        with self.assertWarns(DeprecationWarning):
+            self.client.pay_invoice(invoiceIds=[1])
+
+    def test_send_one_time_pass_warns(self):
+        with self.assertWarns(DeprecationWarning):
+            self.client.send_one_time_pass()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 from typing import Any
 
 from .transport import BaseClient, ResponseDict
@@ -285,10 +286,23 @@ class ApiMethods(BaseClient):
 
     def update_dimension(self, **kwargs: Any) -> ResponseDict:
         """Update dimension
+
+        .. deprecated::
+            This PUTs to ``/dimensions``, which the current Procountor API no
+            longer accepts. Use ``PUT /dimensions/{dimensionId}`` instead, e.g.
+            ``client.put("dimensions/{}".format(dimension_id), json=dimension)``.
+
         :param body: Dimension object
 
         :return: Dictionary with keys: status and content, dict
         """
+        warnings.warn(
+            "update_dimension targets PUT /dimensions, which no longer exists "
+            "in the Procountor API. Use client.put('dimensions/<id>', json=...) "
+            "instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
         method = "PUT"
         endpoint = "dimensions"
@@ -535,9 +549,21 @@ class ApiMethods(BaseClient):
         A valid one time password must be supplied. The default bank account of
         the environment is used for the payment.
 
+        .. deprecated::
+            This PUTs to ``/invoices/pay``, which no longer exists in the
+            current Procountor API. Use the payments endpoints instead (e.g.
+            ``post_payment``).
+
         :param **data: Payment object, dict
         :return: dictionary with status code, dict
         """
+        warnings.warn(
+            "pay_invoice targets PUT /invoices/pay, which no longer exists in "
+            "the Procountor API. Use the payments endpoints (e.g. post_payment) "
+            "instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
         method = "PUT"
         endpoint = "invoices/pay"
@@ -806,8 +832,21 @@ class ApiMethods(BaseClient):
     def send_one_time_pass(self) -> ResponseDict:
         """Sends a one time password for current user via SMS
 
+        .. deprecated::
+            This GETs ``/users/otp``, which no longer exists in the current
+            Procountor API. One-time passwords are now handled through the MFA
+            flow (see the ``/mfatransactionresult/{transactionIdentifier}``
+            endpoint).
+
         :return: Dictionary with status key
         """
+        warnings.warn(
+            "send_one_time_pass targets GET /users/otp, which no longer exists "
+            "in the Procountor API. One-time passwords are now handled via the "
+            "MFA flow (see /mfatransactionresult).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
         method = "GET"
         endpoint = "users/otp"

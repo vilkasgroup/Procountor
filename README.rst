@@ -45,7 +45,7 @@ construction, so creating it requires valid credentials.
         client_secret="your-client-secret",
         redirect_uri="https://your-app.example.com/callback",
         test_mode=True,          # talk to the Procountor test API
-        api_version="supported",  # "latest", "supported" or e.g. "20.01"
+        api_version="supported",  # "supported", "latest" or a dated version e.g. "26.05"
     )
 
     # Every method returns a dict with a "status" key and, on success, "content".
@@ -56,6 +56,47 @@ construction, so creating it requires valid credentials.
 
     # Fetch a single invoice
     invoice = client.get_invoice(8204221)
+
+Calling any endpoint
+--------------------
+
+The Procountor API is large and this library ships named helpers for only a
+subset of it. The client's main job is authentication and token refresh -- once
+you have a client you can reach **any** endpoint with the generic verbs, no
+dedicated method required:
+
+.. code-block:: python
+
+    # GET with query parameters
+    client.get("payrolls/salaryslips", salaryPeriodId=123)
+
+    # POST / PUT with a JSON body (dict or list)
+    client.post("products", json={"name": "Widget", "type": "PURCHASE"})
+    client.put("invoices/8204221/notes", json={"note": "Checked"})
+
+    # DELETE
+    client.delete("attachments/42")
+
+Endpoint paths are relative to the API version base URL (e.g. ``invoices`` or
+``invoices/8204221``). See the official Procountor developer documentation at
+https://dev.procountor.com/ for the full list of endpoints and their payloads.
+
+API versions
+------------
+
+The ``api_version`` argument selects which Procountor API version the client
+talks to:
+
+* ``"supported"`` -- updated to the latest numbered version every three months.
+  Stable and recommended for production integrations. (Default.)
+* ``"latest"`` -- a monthly release with no extended support; may change from
+  month to month.
+* A dated version such as ``"26.05"`` -- a specific release snapshot. Procountor
+  keeps a handful of recent dated versions available, each supported for roughly
+  nine months, so pinning one gives you a predictable upgrade window.
+
+See https://dev.procountor.com/release-notes/ for the current release schedule
+and which dated versions are available.
 
 Credits
 ---------

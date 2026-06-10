@@ -147,6 +147,83 @@ class GetTokenTests(unittest.TestCase):
             Client._get_token(client)
 
 
+class GenericVerbTests(unittest.TestCase):
+    """The generic get/post/put/delete verbs that reach any endpoint."""
+
+    def setUp(self):
+        self.client = build_mock_client()
+        patcher = mock.patch.object(
+            self.client, "request", return_value={"status": 200, "content": {}}
+        )
+        self.mock_request = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_get_builds_query_string(self):
+        self.client.get("invoices", startDate="2024-01-01")
+        self.mock_request.assert_called_once_with(
+            "GET", "invoices?startDate=2024-01-01"
+        )
+
+    def test_get_without_params(self):
+        self.client.get("company")
+        self.mock_request.assert_called_once_with("GET", "company")
+
+    def test_post_sends_json_body(self):
+        self.client.post("products", json={"name": "Widget"})
+        self.mock_request.assert_called_once_with(
+            "POST", "products", json={"name": "Widget"}
+        )
+
+    def test_post_supports_list_body(self):
+        self.client.post("payments", json=[{"id": 1}, {"id": 2}])
+        self.mock_request.assert_called_once_with(
+            "POST", "payments", json=[{"id": 1}, {"id": 2}]
+        )
+
+    def test_put_sends_json_body(self):
+        self.client.put("invoices/7", json={"status": "PAID"})
+        self.mock_request.assert_called_once_with(
+            "PUT", "invoices/7", json={"status": "PAID"}
+        )
+
+    def test_delete(self):
+        self.client.delete("attachments/5")
+        self.mock_request.assert_called_once_with("DELETE", "attachments/5")
+
+
+class RequestBodyTests(unittest.TestCase):
+    """The explicit ``json`` body argument added to request()."""
+
+    def setUp(self):
+        self.client = build_mock_client()
+
+    @mock.patch("procountor.transport.requests.request")
+    def test_explicit_json_list_body_is_sent(self, mock_request):
+        response = mock.Mock()
+        response.status_code = 200
+        response.headers = {"Content-Type": "application/json"}
+        response.json.return_value = {}
+        mock_request.return_value = response
+
+        self.client.request("POST", "payments", json=[{"id": 1}])
+
+        _, kwargs = mock_request.call_args
+        self.assertEqual(kwargs["json"], [{"id": 1}])
+
+    @mock.patch("procountor.transport.requests.request")
+    def test_kwargs_still_become_body(self, mock_request):
+        response = mock.Mock()
+        response.status_code = 200
+        response.headers = {"Content-Type": "application/json"}
+        response.json.return_value = {}
+        mock_request.return_value = response
+
+        self.client.request("POST", "invoices", name="Acme")
+
+        _, kwargs = mock_request.call_args
+        self.assertEqual(kwargs["json"], {"name": "Acme"})
+
+
 class HandleResponseTests(unittest.TestCase):
     def setUp(self):
         self.client = build_mock_client()

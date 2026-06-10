@@ -11,6 +11,13 @@ Unreleased
   ``payments_direct_bank_transfers``) passed the request body into the
   ``headers`` argument, so no JSON body was ever sent. They now forward the body
   correctly. This changes what these methods send on the wire.
+* Added generic ``get``, ``post``, ``put`` and ``delete`` verbs so any
+  Procountor endpoint can be called without a dedicated helper (the named
+  helpers cover only part of the large API surface). ``request`` now also
+  accepts an explicit ``json`` body, allowing top-level JSON array payloads.
+* **Deprecated**: ``pay_invoice``, ``send_one_time_pass`` and
+  ``update_dimension`` now emit a ``DeprecationWarning``; their endpoints no
+  longer exist in the current Procountor API.
 * **Fixed**: ``get_payments`` queried the ``invoices`` endpoint instead of
   ``payments``.
 * **Fixed**: ``create_dimension_item``, ``update_dimension_item`` and

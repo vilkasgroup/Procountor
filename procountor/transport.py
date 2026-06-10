@@ -194,6 +194,7 @@ class BaseClient:
         url: str | None = None,
         files: Any = None,
         *args: Any,
+        json: Any = None,
         **kwargs: Any,
     ) -> ResponseDict:
         """Method to make HTTP requests over Procountor REST API
@@ -201,7 +202,9 @@ class BaseClient:
         :param method: wanted request method, uppercase string
         :param endpoint: wanted REST API endpoint, string
         :param headers: Overwrite HTTP-headers, dict
-        :param kwargs: query parameters to pass to Procountor, dict
+        :param json: explicit JSON body (dict or list). Takes precedence over
+                     ``kwargs``; use this to send a top-level JSON array.
+        :param kwargs: JSON body fields to pass to Procountor, dict
         :return: response from rest server, dict
         """
         headers = headers or self._headers(method, endpoint)
@@ -209,7 +212,8 @@ class BaseClient:
 
         # Test environment (Microsoft-Azure-Application-Gateway)
         # doesn't like if there is a json body in (for ex.) GET method.
-        json = None if len(kwargs) == 0 else kwargs
+        if json is None:
+            json = None if len(kwargs) == 0 else kwargs
 
         response = requests.request(
             method, url, headers=headers, files=files, json=json
@@ -223,6 +227,31 @@ class BaseClient:
             )
 
         return self._handleResponse(response)
+
+    # Generic verbs -- call any Procountor endpoint without a dedicated helper.
+    # The Procountor API surface is large; these reach everything the named
+    # methods do not, while the client keeps handling auth and token refresh.
+
+    def get(self, path: str, **params: Any) -> ResponseDict:
+        """GET any endpoint. Keyword arguments become query parameters.
+
+        Example::
+
+            client.get("invoices", startDate="2024-01-01", endDate="2024-01-31")
+        """
+        return self.request("GET", self._create_endpoint(path, params))
+
+    def post(self, path: str, json: Any = None) -> ResponseDict:
+        """POST any endpoint with an optional JSON body (dict or list)."""
+        return self.request("POST", path, json=json)
+
+    def put(self, path: str, json: Any = None) -> ResponseDict:
+        """PUT any endpoint with an optional JSON body (dict or list)."""
+        return self.request("PUT", path, json=json)
+
+    def delete(self, path: str) -> ResponseDict:
+        """DELETE any endpoint."""
+        return self.request("DELETE", path)
 
     def _headers(self, method: str, endpoint: str) -> dict[str, str]:
         """Method returns correct headers for request
