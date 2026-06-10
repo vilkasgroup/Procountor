@@ -142,10 +142,9 @@ changes)::
 
     uv run bump-my-version bump patch
 
-Push the changes and the new tag::
+Push the commit and the new tag together::
 
-    git push
-    git push --tags
+    git push --follow-tags
 
 Pushing a ``v*`` tag triggers the publish workflow. Double check that the
 GitHub Action runs successfully.

@@ -116,17 +116,20 @@ Releasing new version
 
 When you are ready to release a new version follow these steps:
 
-1. Merge all changes that should be included in the new release to master.
-   And checkout master.
-2. Update HISTORY.rst with the new version number and changes. And commit your
-   changes to master.
-3. run::
+1. Merge all changes that should be included in the new release to master, and
+   check out master.
+2. Update ``HISTORY.rst`` with the new version number and the changes, then
+   commit it.
+3. Bump the version. This updates ``procountor/__init__.py`` and
+   ``pyproject.toml``, creates a commit and creates an annotated ``v<version>``
+   tag::
 
     $ uv run bump-my-version bump patch|minor|major
 
-4. push to master with tags to trigger the publish workflow::
+4. Push the commit and the tag. ``--follow-tags`` sends both at once (a plain
+   ``git push`` would not push the tag)::
 
-    $ git push --tags
-    $ git push
+    $ git push --follow-tags
 
-The GitHub Action will build the tag and, when successful, deploy to PyPI.
+Pushing the ``v<version>`` tag triggers the publish workflow, which builds the
+distributions and, when successful, uploads them to PyPI.
