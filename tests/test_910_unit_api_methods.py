@@ -133,10 +133,10 @@ class WriteBodyDelegationTests(unittest.TestCase):
         args, kwargs = self.mock_request.call_args
         self.assertEqual(args[0], method)
         self.assertEqual(args[1], endpoint)
-        # The body must arrive as keyword arguments, not as a positional
+        # The body must arrive as the JSON payload, not as a positional
         # (headers) argument.
         self.assertEqual(len(args), 2)
-        self.assertEqual(kwargs, body)
+        self.assertEqual(kwargs, {"json": body})
 
     def test_update_company_sends_body(self):
         self.client.update_company(name="Acme Oy")

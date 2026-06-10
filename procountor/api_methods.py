@@ -23,10 +23,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: 'status' for HTTP-status code and 'content' for the file itself, dict
         """
 
-        method = "GET"
         endpoint = "attachments/{}".format(attachmentId)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def delete_attachment(self, attachmentId: int) -> ResponseDict:
         """Deletes requested attachment
@@ -35,10 +34,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with key: status, dict
         """
 
-        method = "DELETE"
         endpoint = "attachments/{}".format(attachmentId)
 
-        return self.request(method, endpoint)
+        return self.delete(endpoint)
 
     def post_attachment(self, meta: dict[str, Any], filename: str) -> ResponseDict:
         """Method sends new attachment to Procountor. The attachment can be of any type but limited to max 10000000
@@ -71,10 +69,9 @@ class ApiMethods(BaseClient):
         :param size: Page size for the results
         :return: Dictionary with request status code ['status'] and ['content'] content of the request
         """
-        method = "GET"
         endpoint = self._create_endpoint("bankaccounts", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # BANK STATEMENTS
     def get_bank_statements(self, startDate: str, endDate: str) -> ResponseDict:
@@ -90,10 +87,9 @@ class ApiMethods(BaseClient):
             'startDate': startDate,
             'endDate': endDate,
         }
-        method = "GET"
         endpoint = self._create_endpoint("bankstatements", dates)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def delete_products_from_bank_statement(self, statementId: int, eventId: int) -> ResponseDict:
         """Method deletes allocation of a product from a bank statement event
@@ -103,10 +99,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with key: status, dict
         """
 
-        method = "DELETE"
         endpoint = "bankstatements/{}/events/{}/products".format(statementId, eventId)
 
-        return self.request(method, endpoint)
+        return self.delete(endpoint)
 
     def put_products_to_bank_statement(self, statementId: int, eventId: int, **data: Any) -> ResponseDict:
         """Method allocates a product to a bank statement event
@@ -117,10 +112,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with key: status, dict
         """
 
-        method = "PUT"
         endpoint = "bankstatements/{}/events/{}/products".format(statementId, eventId)
 
-        return self.request(method, endpoint, **data)
+        return self.put(endpoint, json=data)
 
     # BUSINESS PARTNERS
 
@@ -140,10 +134,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code ['status'] and ['content'] content of the request
         """
 
-        method = "GET"
         endpoint = self._create_endpoint("businesspartners", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_business_partner(self, partnerId: int) -> ResponseDict:
         """Method gets and returns requested business partner with its address
@@ -152,10 +145,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "businesspartners/{}".format(partnerId)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def update_business_partner(self, partnerId: int, **kwargs: Any) -> ResponseDict:
         """Update a business partner
@@ -165,10 +157,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code ['status'] and ['content'] content of the request
         """
 
-        method = "PUT"
         endpoint = "businesspartners/{}".format(partnerId)
 
-        return self.request(method, endpoint, **kwargs)
+        return self.put(endpoint, json=kwargs)
 
     def get_business_partner_details(self) -> ResponseDict:
         """Method gets and returns basic information on person register entry for currently logged in user.
@@ -177,10 +168,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "businesspartners/personaldetails"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # CHART OF ACCOUNTS
     def get_coa(self) -> ResponseDict:
@@ -190,10 +180,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "coa"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # Company
     def get_company(self) -> ResponseDict:
@@ -202,10 +191,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "company"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def update_company(self, **data: Any) -> ResponseDict:
         """Updates basic information of the current company.
@@ -213,10 +201,9 @@ class ApiMethods(BaseClient):
         :param **data: Company info data to update. Company object.
         :return: Dictionary with keys: status and content, dict
         """
-        method = "PUT"
         endpoint = "company"
 
-        return self.request(method, endpoint, **data)
+        return self.put(endpoint, json=data)
 
     # CURRENCIES
     def get_currencies(self) -> ResponseDict:
@@ -225,10 +212,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "currencies"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_currency(self) -> ResponseDict:
         """Gets and returns currency for the current company.
@@ -236,10 +222,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "currencies/company"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_exchange_rate(self, **kwargs: Any) -> ResponseDict:
         """Gets and returns an exchange rate for the given currency.
@@ -253,10 +238,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "{}{}".format("currencies/exchangerate", self._dict_to_url_query(kwargs))
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_latest_currency_rate(self, **kwargs: Any) -> ResponseDict:
         """Gets and returns list of currency rates for the company base currency
@@ -266,10 +250,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = self._create_endpoint("currencies/latest", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # DIMENSIONS
     def get_dimensions(self) -> ResponseDict:
@@ -279,10 +262,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "dimensions"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def update_dimension(self, **kwargs: Any) -> ResponseDict:
         """Update dimension
@@ -304,9 +286,8 @@ class ApiMethods(BaseClient):
             stacklevel=2,
         )
 
-        method = "PUT"
         endpoint = "dimensions"
-        return self.request(method, endpoint, **kwargs)
+        return self.put(endpoint, json=kwargs)
 
     def get_dimension(self, dimensionId: int) -> ResponseDict:
         """Gets and returns a specified dimension with its dimension items
@@ -315,10 +296,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "dimensions/{}".format(dimensionId)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def create_dimension_item(self, dimensionId: int, **data: Any) -> ResponseDict:
         """Method create a new item for dimension
@@ -326,10 +306,9 @@ class ApiMethods(BaseClient):
         :param **data: DimensionItem object.
         """
 
-        method = "POST"
         endpoint = "dimensions/{}/items".format(dimensionId)
 
-        return self.request(method, endpoint, **data)
+        return self.post(endpoint, json=data)
 
     def update_dimension_item(self, dimensionId: int, **data: Any) -> ResponseDict:
         """Update item in dimension
@@ -338,10 +317,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code ['status'] and ['content'] content of the request
         """
 
-        method = "PUT"
         endpoint = "dimensions/{}/items".format(dimensionId)
 
-        return self.request(method, endpoint, **data)
+        return self.put(endpoint, json=data)
 
     # FISCAL YEARS
     def get_fiscal_years(self) -> ResponseDict:
@@ -351,10 +329,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "fiscalyears"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # INVOICES
     def get_invoices(self, **kwargs: Any) -> ResponseDict:
@@ -382,10 +359,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code ['status'] and basic information for the invoices ['content'], dict
         """
 
-        method = "GET"
         endpoint = self._create_endpoint("invoices", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_invoice(self, invoiceId: int) -> ResponseDict:
         """Method gets and returns the requested invoice. Supports expense (bill of charges), purchase,
@@ -395,10 +371,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code ['status'] and request content ['content], dict
         """
 
-        method = "GET"
         endpoint = "invoices/{}".format(invoiceId)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def post_invoice(self, **data: Any) -> ResponseDict:
         """Method posts new invoice to Procountor.
@@ -407,10 +382,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code ['status'] and request content ['content], dict
         """
 
-        method = "POST"
         endpoint = "invoices"
 
-        return self.request(method, endpoint, **data)
+        return self.post(endpoint, json=data)
 
     def approve_invoice(self, invoiceId: int, **data: Any) -> ResponseDict:
         """Method approves invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure
@@ -421,10 +395,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code ['status'] and request content ['content], dict
         """
 
-        method = "PUT"
         endpoint = "invoices/{}/approve".format(invoiceId)
 
-        return self.request(method, endpoint, **data)
+        return self.put(endpoint, json=data)
 
     def get_invoice_comment(self, invoiceId: int) -> ResponseDict:
         """
@@ -432,10 +405,9 @@ class ApiMethods(BaseClient):
 
         :return: Dictionary with request status code ['status'] and request content ['content], dict
         """
-        method = "GET"
         endpoint = "invoices/{}/comments".format(invoiceId)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def post_invoice_comment(self, invoiceId: int, **data: Any) -> ResponseDict:
         """
@@ -444,10 +416,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with key: status and content, dict
         """
 
-        method = "POST"
         endpoint = "invoices/{}/comments".format(invoiceId)
 
-        return self.request(method, endpoint, **data)
+        return self.post(endpoint, json=data)
 
     def get_invoice_paymentevents(self, invoiceId: int, **data: Any) -> ResponseDict:
         """Get payment events
@@ -470,10 +441,9 @@ class ApiMethods(BaseClient):
         :param paymentEventId: Payment identifier
         :return: Dictionary with key: status, dict
         """
-        method = "DELETE"
         endpoint = "invoices/{}/paymentevents/{}".format(invoiceId, paymentEventId)
 
-        return self.request(method, endpoint)
+        return self.delete(endpoint)
 
     def markpaid_invoice(self, invoiceId: int, **data: Any) -> ResponseDict:
         """
@@ -485,10 +455,9 @@ class ApiMethods(BaseClient):
         :return: request status code, integer
         """
 
-        method = "PUT"
         endpoint = "invoices/{}/paymentevents/markpaid".format(invoiceId)
 
-        return self.request(method, endpoint, **data)
+        return self.put(endpoint, json=data)
 
     def send_invoice(self, invoiceId: int) -> ResponseDict:
         """Send a sales invoice to customer
@@ -497,10 +466,9 @@ class ApiMethods(BaseClient):
         :return: Disctionary with status code, dict
         """
 
-        method = "PUT"
         endpoint = "invoices/{}/send".format(invoiceId)
 
-        return self.request(method, endpoint)
+        return self.put(endpoint)
 
     def send_invoice_to_circulation(self, invoiceId: int) -> ResponseDict:
         """Method sends requested invoice to circulation. Supports travel and expense invoices. Invoice circulation
@@ -511,10 +479,9 @@ class ApiMethods(BaseClient):
         :return: Disctionary with status code, dict
         """
 
-        method = "PUT"
         endpoint = "invoices/{}/sendToCirculation".format(str(invoiceId))
 
-        return self.request(method, endpoint)
+        return self.put(endpoint)
 
     def verify_invoice(self, invoiceId: int, **kwargs: Any) -> ResponseDict:
         """Method verifies invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure
@@ -525,10 +492,9 @@ class ApiMethods(BaseClient):
         :return: dictionary with status code, dict
         """
 
-        method = "PUT"
         endpoint = "invoices/{}/verify".format(invoiceId)
 
-        return self.request(method, endpoint, **kwargs)
+        return self.put(endpoint, json=kwargs)
 
     def confirm_invoice(self, transactionId: int) -> ResponseDict:
         """Confirm to make an action related to the given identifier
@@ -537,10 +503,9 @@ class ApiMethods(BaseClient):
         :return: dictionary with status code, dict
         """
 
-        method = "PUT"
         endpoint = "invoices/{}/confirm".format(transactionId)
 
-        return self.request(method, endpoint)
+        return self.put(endpoint)
 
     def pay_invoice(self, **data: Any) -> ResponseDict:
         """Supports purchase invoices and self-assessed tax invoices.
@@ -565,10 +530,9 @@ class ApiMethods(BaseClient):
             stacklevel=2,
         )
 
-        method = "PUT"
         endpoint = "invoices/pay"
 
-        return self.request(method, endpoint, **data)
+        return self.put(endpoint, json=data)
 
     # LEDGER RECEIPTS
     def get_ledger_receipts(self, **kwargs: Any) -> ResponseDict:
@@ -586,10 +550,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = self._create_endpoint("ledgerreceipts", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_ledger_receipt(self, receiptId: int) -> ResponseDict:
         """Method gets and returns the requested ledger receipt. Supported ledger receipt types are journals, sales
@@ -599,10 +562,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "ledgerreceipts/{}".format(receiptId)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def post_ledger_receipt(self, **data: Any) -> ResponseDict:
         """Method sends new ledger receipt to Procountor, Supports journal type ledger receipts
@@ -611,10 +573,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "POST"
         endpoint = "ledgerreceipts"
 
-        return self.request(method, endpoint, **data)
+        return self.post(endpoint, json=data)
 
     def update_ledger_receipt(self, receiptId: int, **data: Any) -> ResponseDict:
         """Method updates requested ledger receipt in Procountor environment. Supported ledger receipt types are
@@ -626,10 +587,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with key: status, dict
         """
 
-        method = "PUT"
         endpoint = "ledgerreceipts/{}".format(receiptId)
 
-        return self.request(method, endpoint, **data)
+        return self.put(endpoint, json=data)
 
     # Payments
     def get_payments(self, **kwargs: Any) -> ResponseDict:
@@ -643,19 +603,17 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = self._create_endpoint("payments", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def post_payment(self, **data: Any) -> ResponseDict:
         """Pay invoices
         :param **data: PaymentsList object, dict
         :return: Dictionary
         """
-        method = "POST"
         endpoint = "payments"
-        return self.request(method, endpoint, **data)
+        return self.post(endpoint, json=data)
 
     def delete_payment(self, paymentId: int) -> ResponseDict:
         """Remove a payment which is not queued or paid
@@ -664,9 +622,8 @@ class ApiMethods(BaseClient):
         :return: Dictionary
         """
 
-        method = "DELETE"
         endpoint = "payments/{}".format(paymentId)
-        return self.request(method, endpoint)
+        return self.delete(endpoint)
 
     def get_payment(self, paymentId: int) -> ResponseDict:
         """Get a payment transaction
@@ -674,9 +631,8 @@ class ApiMethods(BaseClient):
         :param paymentId: Payment identifier
         :return: Dictionary
         """
-        method = "GET"
         endpoint = "payments/{}".format(paymentId)
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def cancel_payment(self, paymentId: int) -> ResponseDict:
         """
@@ -684,9 +640,8 @@ class ApiMethods(BaseClient):
         :return: Dictionary
         """
 
-        method = "PUT"
         endpoint = "payments/{}/cancel".format(paymentId)
-        return self.request(method, endpoint)
+        return self.put(endpoint)
 
     def confirm_payment(self, transactionId: int) -> ResponseDict:
         """Confirmation of action with the given identifier
@@ -694,9 +649,8 @@ class ApiMethods(BaseClient):
         :param transactionId: Transaction identifier to be verified before action performed
         :return: Dictionary
         """
-        method = "PUT"
         endpoint = "payments/{}/confirm".format(transactionId)
-        return self.request(method, endpoint)
+        return self.put(endpoint)
 
     def payments_direct_bank_transfers(self, **data: Any) -> ResponseDict:
         """Creates direct bank transfers with given data
@@ -705,9 +659,8 @@ class ApiMethods(BaseClient):
         :return: Dictionary
         """
 
-        method = "POST"
         endpoint = "payments/directbanktransfers"
-        return self.request(method, endpoint, **data)
+        return self.post(endpoint, json=data)
 
     def payments_error_messages(self, **kwargs: Any) -> ResponseDict:
         """Returns all payment error messages that match the request criteria.
@@ -720,9 +673,8 @@ class ApiMethods(BaseClient):
         :param orderById: Order the results by message ID
         :return: Dictionary
         """
-        method = "GET"
         endpoint = self._create_endpoint("payments/errormessages", kwargs)
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # PRODUCTS
     def get_products(self, **kwargs: Any) -> ResponseDict:
@@ -736,10 +688,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code ['status'] and the list of all products ['content'], dict
         """
 
-        method = "GET"
         endpoint = self._create_endpoint("products", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_product(self, productId: int) -> ResponseDict:
         """Method gets and returns the requested product based on the productId
@@ -748,10 +699,9 @@ class ApiMethods(BaseClient):
         :return: Disctionary with request status code ['status'] and information of wanted product ['content'], dict
         """
 
-        method = "GET"
         endpoint = "products/{}".format(productId)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_product_groups(self, **kwargs: Any) -> ResponseDict:
         """Method gets and returns product groups by product type
@@ -760,10 +710,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code 'status' and list of product groups 'content', dict
         """
 
-        method = "GET"
         endpoint = self._create_endpoint("products/groups", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # Reference payments
     def get_reference_payments(self, **kwargs: Any) -> ResponseDict:
@@ -777,10 +726,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code 'status' and 'content', dict
         """
 
-        method = "GET"
         endpoint = self._create_endpoint("referencepayments", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # Session Information
     def get_session_info(self) -> ResponseDict:
@@ -789,10 +737,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "GET"
         endpoint = "sessioninfo"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # USERS
     def get_users(self) -> ResponseDict:
@@ -801,10 +748,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with request status code (key: status) and user information (key: content), dict
         """
 
-        method = "GET"
         endpoint = "users"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def update_user(self, **data: Any) -> ResponseDict:
         """Update user data. Input: User user object
@@ -812,10 +758,9 @@ class ApiMethods(BaseClient):
         :param **data: User object, dict
         :return: Dictionary with keys: status and content, dict
         """
-        method = "PUT"
         endpoint = "users"
 
-        return self.request(method, endpoint, **data)
+        return self.put(endpoint, json=data)
 
     def user_transaction_confirm(self, transactionId: int) -> ResponseDict:
         """Confirm to make an action related to the given identifier
@@ -824,10 +769,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with keys: status and content, dict
         """
 
-        method = "PUT"
         endpoint = "users/{}/confirm".format(transactionId)
 
-        return self.request(method, endpoint)
+        return self.put(endpoint)
 
     def send_one_time_pass(self) -> ResponseDict:
         """Sends a one time password for current user via SMS
@@ -848,10 +792,9 @@ class ApiMethods(BaseClient):
             stacklevel=2,
         )
 
-        method = "GET"
         endpoint = "users/otp"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_user_profile(self, userId: int) -> ResponseDict:
         """Method gets a user profile based on the given user ID
@@ -860,10 +803,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with  status and content keys
         """
 
-        method = "GET"
         endpoint = "users/profiles/{}".format(userId)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     # VATs
     def get_vats(self) -> ResponseDict:
@@ -872,10 +814,9 @@ class ApiMethods(BaseClient):
         :return: Dictionary with status and content keys.
         """
 
-        method = "GET"
         endpoint = "vats/default"
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)
 
     def get_vats_country(self, **kwargs: Any) -> ResponseDict:
         """Method gets and returns VAT percentages available for the given country
@@ -884,7 +825,6 @@ class ApiMethods(BaseClient):
         :return: Dictionary with status and content keys.
         """
 
-        method = "GET"
         endpoint = self._create_endpoint("vats/country", kwargs)
 
-        return self.request(method, endpoint)
+        return self.get(endpoint)

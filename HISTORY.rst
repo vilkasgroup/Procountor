@@ -15,6 +15,8 @@ Unreleased
   Procountor endpoint can be called without a dedicated helper (the named
   helpers cover only part of the large API surface). ``request`` now also
   accepts an explicit ``json`` body, allowing top-level JSON array payloads.
+  The named helper methods are now thin wrappers over these verbs (no
+  behavioural change to what they send).
 * **Deprecated**: ``pay_invoice``, ``send_one_time_pass`` and
   ``update_dimension`` now emit a ``DeprecationWarning``; their endpoints no
   longer exist in the current Procountor API.
