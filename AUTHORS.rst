@@ -2,12 +2,20 @@
 Credits
 =======
 
-Development Lead
-----------------
+Maintainer
+----------
 
-* Tero Kotti <tero@vilkas.fi>
+* Tatu Wikman <tatu@vilkas.fi>
+
+Previous Maintainers
+--------------------
+
+With thanks for creating and growing this library:
+
+* Tero Kotti
+* Joonas Maliniemi
 
 Contributors
 ------------
 
-None yet. Why not be the first?
+Want to see your name here? Contributions are welcome — see ``CONTRIBUTING.rst``.

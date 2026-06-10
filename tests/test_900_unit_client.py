@@ -107,7 +107,7 @@ class GetTokenTests(unittest.TestCase):
         response.json.return_value = json_data or {}
         return response
 
-    @mock.patch("procountor.client.requests.post")
+    @mock.patch("procountor.transport.requests.post")
     def test_successful_token(self, mock_post):
         mock_post.return_value = self._make_response(
             200, {"access_token": "real-token"}
@@ -118,28 +118,28 @@ class GetTokenTests(unittest.TestCase):
         self.assertEqual(token, "real-token")
         self.assertEqual(client.access_token, "real-token")
 
-    @mock.patch("procountor.client.requests.post")
+    @mock.patch("procountor.transport.requests.post")
     def test_401_raises_runtime_error(self, mock_post):
         mock_post.return_value = self._make_response(401, text="unauthorized")
         client = build_mock_client()
         with self.assertRaises(RuntimeError):
             Client._get_token(client)
 
-    @mock.patch("procountor.client.requests.post")
+    @mock.patch("procountor.transport.requests.post")
     def test_404_raises_runtime_error(self, mock_post):
         mock_post.return_value = self._make_response(404, text="not found")
         client = build_mock_client()
         with self.assertRaises(RuntimeError):
             Client._get_token(client)
 
-    @mock.patch("procountor.client.requests.post")
+    @mock.patch("procountor.transport.requests.post")
     def test_unexpected_status_raises_runtime_error(self, mock_post):
         mock_post.return_value = self._make_response(500, text="boom")
         client = build_mock_client()
         with self.assertRaises(RuntimeError):
             Client._get_token(client)
 
-    @mock.patch("procountor.client.requests.post")
+    @mock.patch("procountor.transport.requests.post")
     def test_missing_access_token_raises_runtime_error(self, mock_post):
         mock_post.return_value = self._make_response(200, {"something_else": 1})
         client = build_mock_client()
@@ -181,7 +181,7 @@ class RequestTests(unittest.TestCase):
     def setUp(self):
         self.client = build_mock_client()
 
-    @mock.patch("procountor.client.requests.request")
+    @mock.patch("procountor.transport.requests.request")
     def test_request_returns_handled_response(self, mock_request):
         response = mock.Mock()
         response.status_code = 200
@@ -198,7 +198,7 @@ class RequestTests(unittest.TestCase):
         self.assertEqual(args[1], "https://pts-api.procountor.com/supported/api/users")
 
     @mock.patch.object(Client, "_get_token", return_value="refreshed-token")
-    @mock.patch("procountor.client.requests.request")
+    @mock.patch("procountor.transport.requests.request")
     def test_request_refreshes_token_on_401(self, mock_request, mock_get_token):
         unauthorized = mock.Mock()
         unauthorized.status_code = 401

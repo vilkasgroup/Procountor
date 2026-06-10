@@ -99,5 +99,67 @@ class ApiMethodDelegationTests(unittest.TestCase):
         self.assert_called_with_positional("GET", "users/otp")
 
 
+class WriteBodyDelegationTests(unittest.TestCase):
+    """Regression tests for the body-forwarding fix.
+
+    These write methods historically passed the request body into ``request``'s
+    ``headers`` positional argument, so no JSON body was ever sent. They must
+    forward the body as keyword arguments (which ``request`` turns into the
+    JSON payload).
+    """
+
+    def setUp(self):
+        self.client = build_mock_client()
+        patcher = mock.patch.object(
+            self.client, "request", return_value={"status": 200, "content": {}}
+        )
+        self.mock_request = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def assert_body_forwarded(self, method, endpoint, **body):
+        self.mock_request.assert_called_once()
+        args, kwargs = self.mock_request.call_args
+        self.assertEqual(args[0], method)
+        self.assertEqual(args[1], endpoint)
+        # The body must arrive as keyword arguments, not as a positional
+        # (headers) argument.
+        self.assertEqual(len(args), 2)
+        self.assertEqual(kwargs, body)
+
+    def test_update_company_sends_body(self):
+        self.client.update_company(name="Acme Oy")
+        self.assert_body_forwarded("PUT", "company", name="Acme Oy")
+
+    def test_update_user_sends_body(self):
+        self.client.update_user(firstName="Jane")
+        self.assert_body_forwarded("PUT", "users", firstName="Jane")
+
+    def test_update_business_partner_sends_body(self):
+        self.client.update_business_partner(42, name="Acme Oy")
+        self.assert_body_forwarded("PUT", "businesspartners/42", name="Acme Oy")
+
+    def test_update_dimension_sends_body(self):
+        self.client.update_dimension(id=1, name="Cost center")
+        self.assert_body_forwarded("PUT", "dimensions", id=1, name="Cost center")
+
+    def test_create_dimension_item_sends_body(self):
+        self.client.create_dimension_item(1, name="Item")
+        self.assert_body_forwarded("POST", "/dimensions/1/items", name="Item")
+
+    def test_update_dimension_item_sends_body(self):
+        self.client.update_dimension_item(1, name="Item")
+        self.assert_body_forwarded("PUT", "/dimensions/1/items", name="Item")
+
+    def test_post_payment_sends_body(self):
+        self.client.post_payment(payments=[{"id": 1}])
+        self.assert_body_forwarded("POST", "payments", payments=[{"id": 1}])
+
+    def test_payments_direct_bank_transfers_sends_body(self):
+        self.client.payments_direct_bank_transfers(transfers=[{"id": 1}])
+        self.assert_body_forwarded(
+            "POST", "payments/directbanktransfers", transfers=[{"id": 1}]
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

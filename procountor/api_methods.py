@@ -1,10 +1,20 @@
+from __future__ import annotations
+
 import json
+from typing import Any
+
+from .transport import BaseClient, ResponseDict
 
 
-class ApiMethods(object):
+class ApiMethods(BaseClient):
+    """High-level helpers for the Procountor REST API endpoints.
+
+    Builds on :class:`procountor.transport.BaseClient`, which provides the HTTP
+    transport and authentication used by every method here.
+    """
 
     # Attachments
-    def get_attachment(self, attachmentId):
+    def get_attachment(self, attachmentId: int) -> ResponseDict:
         """Gets and returns an attachment based on given attachment ID. Both attachment metadata (application/json) and
         the file itself will be returned. Content-type for the r is multipart/mixed.
 
@@ -17,7 +27,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def delete_attachment(self, attachmentId):
+    def delete_attachment(self, attachmentId: int) -> ResponseDict:
         """Deletes requested attachment
 
         :param attachmentId: ID of the requested attachment to delete, integer
@@ -29,7 +39,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def post_attachment(self, meta, filename):
+    def post_attachment(self, meta: dict[str, Any], filename: str) -> ResponseDict:
         """Method sends new attachment to Procountor. The attachment can be of any type but limited to max 10000000
         bytes (10MB). Content-type for the request is multipart/form-data. Type for the meta data is application/json.
 
@@ -51,7 +61,7 @@ class ApiMethods(object):
             return self.request(method, endpoint, files=files, headers=self._headers(method, endpoint))
 
     # Bank accounts
-    def get_bank_accounts(self, **kwargs):
+    def get_bank_accounts(self, **kwargs: Any) -> ResponseDict:
         """Method returns the bank accounts for the current environment.
 
         :param previousId: Previous bank account ID for pagination. If this field is set and results are ordered by order number, value has to an identifier of existing bank account in the given company.
@@ -66,7 +76,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # BANK STATEMENTS
-    def get_bank_statements(self, startDate, endDate):
+    def get_bank_statements(self, startDate: str, endDate: str) -> ResponseDict:
         """Gets and returns all bank statements that match the request criteria. Each BankStatementEvent can have a
         list of child events. In that case, the event model contains an additional "event" property with an array of
         BankStatementEvents as its value.
@@ -84,7 +94,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def delete_products_from_bank_statement(self, statementId, eventId):
+    def delete_products_from_bank_statement(self, statementId: int, eventId: int) -> ResponseDict:
         """Method deletes allocation of a product from a bank statement event
 
         :param statementId: ID of the bankstatement, integer
@@ -97,7 +107,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def put_products_to_bank_statement(self, statementId, eventId, **data):
+    def put_products_to_bank_statement(self, statementId: int, eventId: int, **data: Any) -> ResponseDict:
         """Method allocates a product to a bank statement event
 
         :param statementId: ID of the bankstatement, integer
@@ -113,7 +123,7 @@ class ApiMethods(object):
 
     # BUSINESS PARTNERS
 
-    def get_business_partners(self, **kwargs):
+    def get_business_partners(self, **kwargs: Any) -> ResponseDict:
         """Method finds business partners matching search criteria
 
         :param name: Business partner name
@@ -134,7 +144,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_business_partner(self, partnerId):
+    def get_business_partner(self, partnerId: int) -> ResponseDict:
         """Method gets and returns requested business partner with its address
 
         :param partnerId: business partner's identifier, integer
@@ -146,7 +156,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def update_business_partner(self, partnerId, **kwargs):
+    def update_business_partner(self, partnerId: int, **kwargs: Any) -> ResponseDict:
         """Update a business partner
 
         :param partnerId: business partner's identifier, integer
@@ -157,9 +167,9 @@ class ApiMethods(object):
         method = "PUT"
         endpoint = "businesspartners/{}".format(partnerId)
 
-        return self.request(method, endpoint, kwargs)
+        return self.request(method, endpoint, **kwargs)
 
-    def get_business_partner_details(self):
+    def get_business_partner_details(self) -> ResponseDict:
         """Method gets and returns basic information on person register entry for currently logged in user.
         Includes eg. name, address and payment information
 
@@ -172,7 +182,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # CHART OF ACCOUNTS
-    def get_coa(self):
+    def get_coa(self) -> ResponseDict:
         """Method gets and returns the chart of accounts for the current environment. It can be modified on the Chart
         of accounts page in Procountor.
 
@@ -185,7 +195,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # Company
-    def get_company(self):
+    def get_company(self) -> ResponseDict:
         """Method returns basic information of the currently logged in company.
 
         :return: Dictionary with keys: status and content, dict
@@ -196,7 +206,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def update_company(self, **data):
+    def update_company(self, **data: Any) -> ResponseDict:
         """Updates basic information of the current company.
 
         :param **data: Company info data to update. Company object.
@@ -205,10 +215,10 @@ class ApiMethods(object):
         method = "PUT"
         endpoint = "company"
 
-        return self.request(method, endpoint, data)
+        return self.request(method, endpoint, **data)
 
     # CURRENCIES
-    def get_currencies(self):
+    def get_currencies(self) -> ResponseDict:
         """Gets and returns all available currencies
 
         :return: Dictionary with keys: status and content, dict
@@ -219,7 +229,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_currency(self):
+    def get_currency(self) -> ResponseDict:
         """Gets and returns currency for the current company.
 
         :return: Dictionary with keys: status and content, dict
@@ -230,7 +240,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_exchange_rate(self, **kwargs):
+    def get_exchange_rate(self, **kwargs: Any) -> ResponseDict:
         """Gets and returns an exchange rate for the given currency.
 
         :param baseCurrency: base currency for conversion, string
@@ -247,7 +257,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_latest_currency_rate(self, **kwargs):
+    def get_latest_currency_rate(self, **kwargs: Any) -> ResponseDict:
         """Gets and returns list of currency rates for the company base currency
 
         :param rateType: requested rate type, integer, values: 1 - Procountor Accounting Exchange Rate, 2 - Average
@@ -261,7 +271,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # DIMENSIONS
-    def get_dimensions(self):
+    def get_dimensions(self) -> ResponseDict:
         """Gets and returns a list of all dimensions and dimension items for the current company. Dimensions can be set
         on the Dimensions page in Procountor.
 
@@ -273,7 +283,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def update_dimension(self, **kwargs):
+    def update_dimension(self, **kwargs: Any) -> ResponseDict:
         """Update dimension
         :param body: Dimension object
 
@@ -282,9 +292,9 @@ class ApiMethods(object):
 
         method = "PUT"
         endpoint = "dimensions"
-        return self.request(method, endpoint, kwargs)
+        return self.request(method, endpoint, **kwargs)
 
-    def get_dimension(self, dimensionId):
+    def get_dimension(self, dimensionId: int) -> ResponseDict:
         """Gets and returns a specified dimension with its dimension items
 
         :param dimensionId: dimension identifier, integer
@@ -296,7 +306,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def create_dimension_item(self, dimensionId, **data):
+    def create_dimension_item(self, dimensionId: int, **data: Any) -> ResponseDict:
         """Method create a new item for dimension
 
         :param **data: DimensionItem object.
@@ -305,9 +315,9 @@ class ApiMethods(object):
         method = "POST"
         endpoint ="/dimensions/{}/items".format(dimensionId)
 
-        return self.request(method, endpoint, data)
+        return self.request(method, endpoint, **data)
 
-    def update_dimension_item(self, dimensionId, **data):
+    def update_dimension_item(self, dimensionId: int, **data: Any) -> ResponseDict:
         """Update item in dimension
         :param **data: DimensionItem object to update
 
@@ -317,10 +327,10 @@ class ApiMethods(object):
         method = "PUT"
         endpoint ="/dimensions/{}/items".format(dimensionId)
 
-        return self.request(method, endpoint, data)
+        return self.request(method, endpoint, **data)
 
     # FISCAL YEARS
-    def get_fiscal_years(self):
+    def get_fiscal_years(self) -> ResponseDict:
         """Gets and returns fiscal years ordered by their start date, from newest to oldest. Tracking periods, if
         exist, are in chronological order. Fiscal years can be edited on the Fiscal years page in Procountor.
 
@@ -333,7 +343,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # INVOICES
-    def get_invoices(self, **kwargs):
+    def get_invoices(self, **kwargs: Any) -> ResponseDict:
         """Method searches invoices. Returns a list containing basic information for the invoices. The ID in each
         result entry can be used to fetch complete invoice details with the GET /invoices/{invoiceId} endpoint,
         get_invoice() method. Supports purchase, sales, self-assessed tax, travel and expense (bill of charges)
@@ -363,7 +373,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_invoice(self, invoiceId):
+    def get_invoice(self, invoiceId: int) -> ResponseDict:
         """Method gets and returns the requested invoice. Supports expense (bill of charges), purchase,
         sales,self-assessed tax and travel invoices.
 
@@ -376,7 +386,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def post_invoice(self, **data):
+    def post_invoice(self, **data: Any) -> ResponseDict:
         """Method posts new invoice to Procountor.
 
         :param **data: Invoice data objects, dict
@@ -388,7 +398,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint, **data)
 
-    def approve_invoice(self, invoiceId, **data):
+    def approve_invoice(self, invoiceId: int, **data: Any) -> ResponseDict:
         """Method approves invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure
         invoice circulation settings in the Procountor environment before using this.
 
@@ -402,7 +412,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint, **data)
 
-    def get_invoice_comment(self, invoiceId):
+    def get_invoice_comment(self, invoiceId: int) -> ResponseDict:
         """
         Get invoice comments
 
@@ -413,7 +423,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def post_invoice_comment(self, invoiceId, **data):
+    def post_invoice_comment(self, invoiceId: int, **data: Any) -> ResponseDict:
         """
         :param invoiceId: ID of the invoice
         :param **data: CommentDTO, dict
@@ -425,7 +435,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint, **data)
 
-    def get_invoice_paymentevents(self, invoiceId, **data):
+    def get_invoice_paymentevents(self, invoiceId: int, **data: Any) -> ResponseDict:
         """Get payment events
         :param invoiceId: Invoice identifier
         :param previousId: Previous payment event ID for pagination
@@ -439,7 +449,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint, **data)
 
-    def delete_invoice_paymentevent(self, invoiceId, paymentEventId):
+    def delete_invoice_paymentevent(self, invoiceId: int, paymentEventId: int) -> ResponseDict:
         """Remove a payment event which is not actually related to paying through the software i.e. with the status 'marked paid'.
 
         :param invoiceId: Invoice identifier
@@ -451,7 +461,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def markpaid_invoice(self, invoiceId, **data):
+    def markpaid_invoice(self, invoiceId: int, **data: Any) -> ResponseDict:
         """
         Method marks payment events as paid. Supported invoice types: SALES_INVOICE, PURCHASE_INVOICE, TRAVEL_INVOICE,
         SALARY, PERIODIC_TAX_RETURN, BILL_OF_CHARGES
@@ -466,7 +476,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint, **data)
 
-    def send_invoice(self, invoiceId):
+    def send_invoice(self, invoiceId: int) -> ResponseDict:
         """Send a sales invoice to customer
 
         :param invoiceId: ID of the invoice, int or string
@@ -478,7 +488,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def send_invoice_to_circulation(self, invoiceId):
+    def send_invoice_to_circulation(self, invoiceId: int) -> ResponseDict:
         """Method sends requested invoice to circulation. Supports travel and expense invoices. Invoice circulation
         needs to be configured and enabled in Procountor settings. Marks invoice status as 'RECEIVED' when it is in
         'UNFINISHED' status.
@@ -492,7 +502,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def verify_invoice(self, invoiceId, **kwargs):
+    def verify_invoice(self, invoiceId: int, **kwargs: Any) -> ResponseDict:
         """Method verifies invoice in Procountor environment. Supports purchase, travel and expense invoices. Configure
         invoice circulation settings in the Procountor environment before using this.
 
@@ -506,7 +516,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint, **kwargs)
 
-    def confirm_invoice(self, transactionId):
+    def confirm_invoice(self, transactionId: int) -> ResponseDict:
         """Confirm to make an action related to the given identifier
 
         :param transactionId:Transaction identifier to be verified before action performed
@@ -518,7 +528,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def pay_invoice(self, **data):
+    def pay_invoice(self, **data: Any) -> ResponseDict:
         """Supports purchase invoices and self-assessed tax invoices.
         All of the invoices have to be valid in order to pay.
         If paying one of the invoices fails, none of the invoices will be paid.
@@ -535,7 +545,7 @@ class ApiMethods(object):
         return self.request(method, endpoint, **data)
 
     # LEDGER RECEIPTS
-    def get_ledger_receipts(self, **kwargs):
+    def get_ledger_receipts(self, **kwargs: Any) -> ResponseDict:
         """Method gets and returns a list containing basic information for the receipts. The receiptID in each result
         entry can be used to fetch complete receipt details with the GET /ledgerereceipts/{receiptId} endpoint,
         get_ledger_receipt() method. Supported ledger receipt types are journals, sales invoice ledger receipts and
@@ -555,7 +565,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_ledger_receipt(self, receiptId):
+    def get_ledger_receipt(self, receiptId: int) -> ResponseDict:
         """Method gets and returns the requested ledger receipt. Supported ledger receipt types are journals, sales
         invoice ledger receipts and purchase invoice ledger receipts
 
@@ -568,7 +578,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def post_ledger_receipt(self, **data):
+    def post_ledger_receipt(self, **data: Any) -> ResponseDict:
         """Method sends new ledger receipt to Procountor, Supports journal type ledger receipts
 
         :param **data: ledger receipt data, dict
@@ -580,7 +590,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint, **data)
 
-    def update_ledger_receipt(self, receiptId, **data):
+    def update_ledger_receipt(self, receiptId: int, **data: Any) -> ResponseDict:
         """Method updates requested ledger receipt in Procountor environment. Supported ledger receipt types are
         journals, sales invoice ledger receipts and purchase invoice ledger receipts. For defining the ledger accounts,
         dimensions, VAT status or other accounting information for an invoice, use this method.
@@ -596,7 +606,7 @@ class ApiMethods(object):
         return self.request(method, endpoint, **data)
 
     # Payments
-    def get_payments(self, **kwargs):
+    def get_payments(self, **kwargs: Any) -> ResponseDict:
         """Get payment transactions
 
         :param startDate: Start date of the search (value date)
@@ -612,16 +622,16 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def post_payment(self, **data):
+    def post_payment(self, **data: Any) -> ResponseDict:
         """Pay invoices
         :param **data: PaymentsList object, dict
         :return: Dictionary
         """
         method = "POST"
         endpoint = "payments"
-        return self.request(method, endpoint, data)
+        return self.request(method, endpoint, **data)
 
-    def delete_payment(self, paymentId):
+    def delete_payment(self, paymentId: int) -> ResponseDict:
         """Remove a payment which is not queued or paid
 
         :param paymentId: Payment identifier
@@ -632,7 +642,7 @@ class ApiMethods(object):
         endpoint = "payments/{}".format(paymentId)
         return self.request(method, endpoint)
 
-    def get_payment(self, paymentId):
+    def get_payment(self, paymentId: int) -> ResponseDict:
         """Get a payment transaction
 
         :param paymentId: Payment identifier
@@ -642,7 +652,7 @@ class ApiMethods(object):
         endpoint = "payments/{}".format(paymentId)
         return self.request(method, endpoint)
 
-    def cancel_payment(self, paymentId):
+    def cancel_payment(self, paymentId: int) -> ResponseDict:
         """
         :param paymentId: Payment identifier
         :return: Dictionary
@@ -652,7 +662,7 @@ class ApiMethods(object):
         endpoint = "payments/{}/cancel".format(paymentId)
         return self.request(method, endpoint)
 
-    def confirm_payment(self, transactionId):
+    def confirm_payment(self, transactionId: int) -> ResponseDict:
         """Confirmation of action with the given identifier
 
         :param transactionId: Transaction identifier to be verified before action performed
@@ -662,7 +672,7 @@ class ApiMethods(object):
         endpoint = "payments/{}/confirm".format(transactionId)
         return self.request(method, endpoint)
 
-    def payments_direct_bank_transfers(self, **data):
+    def payments_direct_bank_transfers(self, **data: Any) -> ResponseDict:
         """Creates direct bank transfers with given data
 
         :param data: Contains a list of direct bank transfer to be created
@@ -671,9 +681,9 @@ class ApiMethods(object):
 
         method = "POST"
         endpoint = "payments/directbanktransfers"
-        return self.request(method, endpoint, data)
+        return self.request(method, endpoint, **data)
 
-    def payments_error_messages(self, **kwargs):
+    def payments_error_messages(self, **kwargs: Any) -> ResponseDict:
         """Returns all payment error messages that match the request criteria.
 
         :param createdStartDate: Start date of the search (value date)
@@ -689,7 +699,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # PRODUCTS
-    def get_products(self, **kwargs):
+    def get_products(self, **kwargs: Any) -> ResponseDict:
         """Method gets and Returns a paginated list of products in the current environment, starting from "previousId"
         limited by "limit". Takes optional query parameters.
 
@@ -705,7 +715,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_product(self, productId):
+    def get_product(self, productId: int) -> ResponseDict:
         """Method gets and returns the requested product based on the productId
 
         :param productId: wanted product's Id, integer
@@ -717,7 +727,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_product_groups(self, **kwargs):
+    def get_product_groups(self, **kwargs: Any) -> ResponseDict:
         """Method gets and returns product groups by product type
 
         :param productType: Product type, string
@@ -730,7 +740,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # Reference payments
-    def get_reference_payments(self, **kwargs):
+    def get_reference_payments(self, **kwargs: Any) -> ResponseDict:
         """Returns all reference payments that match the request criteria.
 
         :param accountNumber: The bank account number to use when searching for related reference payments
@@ -747,7 +757,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # Session Information
-    def get_session_info(self):
+    def get_session_info(self) -> ResponseDict:
         """Returns basic information about the current session.
 
         :return: Dictionary with keys: status and content, dict
@@ -759,7 +769,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # USERS
-    def get_users(self):
+    def get_users(self) -> ResponseDict:
         """Method returns details of the currently logged in user based on the access token
 
         :return: Dictionary with request status code (key: status) and user information (key: content), dict
@@ -770,7 +780,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def update_user(self, **data):
+    def update_user(self, **data: Any) -> ResponseDict:
         """Update user data. Input: User user object
 
         :param **data: User object, dict
@@ -779,9 +789,9 @@ class ApiMethods(object):
         method = "PUT"
         endpoint = "users"
 
-        return self.request(method, endpoint, data)
+        return self.request(method, endpoint, **data)
 
-    def user_transaction_confirm(self, transactionId):
+    def user_transaction_confirm(self, transactionId: int) -> ResponseDict:
         """Confirm to make an action related to the given identifier
 
         :param transactionId: Transaction identifier to be verified before action performed
@@ -793,7 +803,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def send_one_time_pass(self):
+    def send_one_time_pass(self) -> ResponseDict:
         """Sends a one time password for current user via SMS
 
         :return: Dictionary with status key
@@ -804,7 +814,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_user_profile(self, userId):
+    def get_user_profile(self, userId: int) -> ResponseDict:
         """Method gets a user profile based on the given user ID
 
         :param userId: requested user's ID, integer
@@ -817,7 +827,7 @@ class ApiMethods(object):
         return self.request(method, endpoint)
 
     # VATs
-    def get_vats(self):
+    def get_vats(self) -> ResponseDict:
         """Method gets and returns VAT percentages for the current company
 
         :return: Dictionary with status and content keys.
@@ -828,7 +838,7 @@ class ApiMethods(object):
 
         return self.request(method, endpoint)
 
-    def get_vats_country(self, **kwargs):
+    def get_vats_country(self, **kwargs: Any) -> ResponseDict:
         """Method gets and returns VAT percentages available for the given country
 
         :param countryCode: ISO 3166-1 alpha-2 format, string

@@ -5,6 +5,18 @@ History
 Unreleased
 ----------
 
+* **Fixed**: eight write methods (``update_company``, ``update_user``,
+  ``update_business_partner``, ``update_dimension``, ``create_dimension_item``,
+  ``update_dimension_item``, ``post_payment`` and
+  ``payments_direct_bank_transfers``) passed the request body into the
+  ``headers`` argument, so no JSON body was ever sent. They now forward the body
+  correctly. This changes what these methods send on the wire.
+* Added type hints throughout the package and a ``py.typed`` marker so the
+  types are exposed to downstream users. The client is now split into a
+  ``BaseClient`` (HTTP transport) and the ``ApiMethods`` endpoint helpers;
+  ``procountor.client.Client`` and all of its methods are unchanged.
+* ``Client`` is now importable directly from the top-level package
+  (``from procountor import Client``).
 * Project tooling modernized:
 
   * Migrated packaging from ``setup.py``/``setup.cfg`` to ``pyproject.toml``
