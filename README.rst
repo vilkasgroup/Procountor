@@ -2,21 +2,13 @@
 Procountor
 ===================
 
-.. image:: https://img.shields.io/travis/vilkasgroup/Procountor.svg
-   :target: https://travis-ci.org/vilkasgroup/Procountor
-   :alt: Build status on travis
+.. image:: https://github.com/vilkasgroup/Procountor/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/vilkasgroup/Procountor/actions/workflows/ci.yml
+   :alt: CI status
 
 .. image:: https://readthedocs.org/projects/procountor/badge/?version=latest
    :target: https://procountor.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
-
-.. image:: https://pyup.io/repos/github/vilkasgroup/Procountor/shield.svg
-   :target: https://pyup.io/repos/github/vilkasgroup/Procountor/
-   :alt: Updates status
-
-.. image:: https://coveralls.io/repos/github/vilkasgroup/Procountor/badge.svg?branch=master
-   :target: https://coveralls.io/github/vilkasgroup/Procountor?branch=master
-   :alt: Coveralls status
 
 
 Python library for calling Procountor services
@@ -39,28 +31,45 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
 
 
-Releasing new version to pypi
----------
+Development
+-----------
 
-Install dev tools
+This project uses `uv <https://docs.astral.sh/uv/>`_ for dependency and
+environment management.
 
-```
-pipenv install --dev
-```
+Set up the environment and run the test suite::
 
-Update `HISTORY.rst` and commit the changes.
+    uv sync
+    uv run pytest
+    uv run ruff check procountor tests
 
-Bump version. (patch | minor | major depending on the scale of changes)
+The unit tests run fully offline. The live integration tests against the
+Procountor test API are skipped unless you opt in by exporting the
+``PROCOUNTOR_*`` credentials and ``PROCOUNTOR_RUN_INTEGRATION=1``::
 
-```
-bumpversion patch
-```
+    export PROCOUNTOR_RUN_INTEGRATION=1
+    export PROCOUNTOR_API_KEY=...
+    export PROCOUNTOR_CLIENT_ID=...
+    export PROCOUNTOR_CLIENT_SECRET=...
+    export PROCOUNTOR_REDIRECT_URI=...
+    export PROCOUNTOR_API_VERSION=...
+    uv run pytest
 
-Push changes and tags.
 
-```
-git push
-git push --tags
-```
+Releasing a new version to PyPI
+-------------------------------
 
-Double check that the github action runs successfully.
+Update ``HISTORY.rst`` and commit the changes.
+
+Bump the version (``patch`` | ``minor`` | ``major`` depending on the scale of
+changes)::
+
+    uv run bump-my-version bump patch
+
+Push the changes and the new tag::
+
+    git push
+    git push --tags
+
+Pushing a ``v*`` tag triggers the publish workflow. Double check that the
+GitHub Action runs successfully.

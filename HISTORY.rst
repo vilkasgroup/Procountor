@@ -2,6 +2,24 @@
 History
 =======
 
+Unreleased
+----------
+
+* Project tooling modernized:
+
+  * Migrated packaging from ``setup.py``/``setup.cfg`` to ``pyproject.toml``
+    (PEP 621, hatchling build backend) and adopted ``uv`` for dependency and
+    environment management. Removed ``Pipfile``/``Pipfile.lock``,
+    ``requirements.txt``, ``tox.ini`` and the dead ``.pyup.yml``.
+  * Dropped Python 2 support; now requires Python 3.9+.
+  * Refreshed dependencies so transitive packages (urllib3, etc.) resolve to
+    current, non-vulnerable versions.
+  * Added an offline unit-test suite. The live integration tests now skip by
+    default and only run with ``PROCOUNTOR_RUN_INTEGRATION=1`` and credentials.
+  * Added a GitHub Actions CI workflow (ruff lint + pytest matrix on Python
+    3.9–3.13) and modernized the PyPI publish workflow to build with ``uv``.
+  * Added the previously empty ``LICENSE`` (MIT) file.
+
 2.5.0 (2025-07-31)
 ------------------
 

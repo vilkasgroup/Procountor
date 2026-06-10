@@ -4,11 +4,7 @@ import re
 import requests
 from requests_toolbelt.multipart import decoder
 
-try:
-    from urllib.parse import urlparse, parse_qs, urlencode
-except ImportError:
-    from urlparse import urlparse, parse_qs
-    from urllib import urlencode
+from urllib.parse import urlencode
 
 from .api_methods import ApiMethods
 
@@ -154,7 +150,7 @@ class Client(ApiMethods):
         if access_token is None:
             raise RuntimeError(
                 "Cannot read the access_token from the response. Response was: "
-                + json_content
+                + str(json_content)
             )
 
         self.access_token = access_token
@@ -179,7 +175,7 @@ class Client(ApiMethods):
                     answer["metadata"] = json.loads(meta.content.decode("utf-8"))
                 else:
                     answer["content"] = response.json()
-            except:
+            except Exception:
                 answer["message"] = response.text
         else:
             answer["message"] = response.text

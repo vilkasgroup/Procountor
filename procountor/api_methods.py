@@ -187,7 +187,7 @@ class ApiMethods(object):
     # Company
     def get_company(self):
         """Method returns basic information of the currently logged in company.
-        
+
         :return: Dictionary with keys: status and content, dict
         """
 
@@ -301,7 +301,7 @@ class ApiMethods(object):
 
         :param **data: DimensionItem object.
         """
-        
+
         method = "POST"
         endpoint ="/dimensions/{}/items".format(dimensionId)
 
@@ -419,7 +419,7 @@ class ApiMethods(object):
         :param **data: CommentDTO, dict
         :return: Dictionary with key: status and content, dict
         """
-    
+
         method = "POST"
         endpoint = "invoices/{}/comments".format(invoiceId)
 
@@ -455,7 +455,7 @@ class ApiMethods(object):
         """
         Method marks payment events as paid. Supported invoice types: SALES_INVOICE, PURCHASE_INVOICE, TRAVEL_INVOICE,
         SALARY, PERIODIC_TAX_RETURN, BILL_OF_CHARGES
- 
+
         :param invoiceId: ID of the invoice, integer
         :param **data: MarkInvoiceAsPaid object, dict
         :return: request status code, integer
@@ -512,7 +512,7 @@ class ApiMethods(object):
         :param transactionId:Transaction identifier to be verified before action performed
         :return: dictionary with status code, dict
         """
-    
+
         method = "PUT"
         endpoint = "/invoices/{}/confirm".format(transactionId)
 

@@ -41,7 +41,7 @@ class TestClientBankStatements(TestClient):
 
     def test_100_error_because_dates_are_invalidate(self):
       """
-      Error becausestart and end date are not dates 
+      Error becausestart and end date are not dates
       """
 
       response = self.client.get_bank_statements(startDate='aa', endDate='bb')

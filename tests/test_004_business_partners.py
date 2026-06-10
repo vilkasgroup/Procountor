@@ -30,7 +30,7 @@ class TestClientBusinessPartners(TestClient):
     def test_004_get_business_partner_details(self):
         response = self.client.get_business_partner_details()
         self.assertEqual(response['status'], 200)
-        self.assertIsNotNone(response['content']['personId']) 
+        self.assertIsNotNone(response['content']['personId'])
 
 if __name__ == '__main__':
     unittest.main()
