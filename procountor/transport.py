@@ -161,10 +161,17 @@ class BaseClient:
         return access_token
 
     def _handleResponse(self, response: requests.Response) -> ResponseDict:
-        """
-        TODO: This text
+        """Convert a ``requests`` response into a plain result dict.
 
-        :return: response as dict. Dict has a key named status for HTTP-status code. In error case there is string
+        The returned dict always has a ``status`` key with the HTTP status code.
+        On a successful (200/202) response the parsed JSON body is placed under
+        ``content``; for multipart responses the file bytes are under
+        ``content`` and the parsed metadata under ``metadata``. On any error, or
+        when the body cannot be parsed, the raw response text is placed under
+        ``message``.
+
+        :param response: the ``requests`` response to interpret
+        :return: dict with ``status`` plus ``content`` (and ``metadata``) or ``message``
         """
 
         answer: ResponseDict = {"status": response.status_code}
