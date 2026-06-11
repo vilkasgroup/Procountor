@@ -1,0 +1,247 @@
+"""Offline unit tests for :mod:`procountor.api_methods`.
+
+Each test mocks ``Client.request`` and asserts that the high-level helper
+delegates with the correct HTTP method and endpoint. This pins down the URL
+construction without touching the network.
+"""
+
+import unittest
+import warnings
+from unittest import mock
+
+from tests.test_client import build_mock_client
+
+
+class ApiMethodDelegationTests(unittest.TestCase):
+    def setUp(self):
+        self.client = build_mock_client()
+        patcher = mock.patch.object(
+            self.client, "request", return_value={"status": 200, "content": {}}
+        )
+        self.mock_request = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def assert_called_with_positional(self, method, endpoint):
+        self.mock_request.assert_called_once()
+        args, _ = self.mock_request.call_args
+        self.assertEqual(args[0], method)
+        self.assertEqual(args[1], endpoint)
+
+    def test_get_attachment(self):
+        self.client.get_attachment(123)
+        self.assert_called_with_positional("GET", "attachments/123")
+
+    def test_delete_attachment(self):
+        self.client.delete_attachment(123)
+        self.assert_called_with_positional("DELETE", "attachments/123")
+
+    def test_get_bank_accounts_no_params(self):
+        self.client.get_bank_accounts()
+        self.assert_called_with_positional("GET", "bankaccounts")
+
+    def test_get_bank_accounts_with_params(self):
+        self.client.get_bank_accounts(size=5)
+        self.assert_called_with_positional("GET", "bankaccounts?size=5")
+
+    def test_get_business_partners(self):
+        self.client.get_business_partners()
+        self.assert_called_with_positional("GET", "businesspartners")
+
+    def test_get_business_partner(self):
+        self.client.get_business_partner(42)
+        self.assert_called_with_positional("GET", "businesspartners/42")
+
+    def test_get_coa(self):
+        self.client.get_coa()
+        self.assert_called_with_positional("GET", "coa")
+
+    def test_get_company(self):
+        self.client.get_company()
+        self.assert_called_with_positional("GET", "company")
+
+    def test_get_currencies(self):
+        self.client.get_currencies()
+        self.assert_called_with_positional("GET", "currencies")
+
+    def test_get_fiscal_years(self):
+        self.client.get_fiscal_years()
+        self.assert_called_with_positional("GET", "fiscalyears")
+
+    def test_get_invoice(self):
+        self.client.get_invoice(7)
+        self.assert_called_with_positional("GET", "invoices/7")
+
+    def test_get_invoices_with_params(self):
+        self.client.get_invoices(startDate="2024-01-01")
+        self.assert_called_with_positional("GET", "invoices?startDate=2024-01-01")
+
+    def test_get_invoice_paymentevents_uses_query_params(self):
+        # Regression: these are query parameters, not a GET request body.
+        self.client.get_invoice_paymentevents(7, size=20, page=2)
+        self.assert_called_with_positional(
+            "GET", "invoices/7/paymentevents?size=20&page=2"
+        )
+
+    def test_get_payments_uses_payments_endpoint(self):
+        # Regression: this used to query the "invoices" endpoint by mistake.
+        self.client.get_payments(startDate="2024-01-01")
+        self.assert_called_with_positional("GET", "payments?startDate=2024-01-01")
+
+    def test_get_payment(self):
+        self.client.get_payment(99)
+        self.assert_called_with_positional("GET", "payments/99")
+
+    def test_confirm_invoice_endpoint_has_no_leading_slash(self):
+        self.client.confirm_invoice(7)
+        self.assert_called_with_positional("PUT", "invoices/7/confirm")
+
+    def test_delete_payment(self):
+        self.client.delete_payment(99)
+        self.assert_called_with_positional("DELETE", "payments/99")
+
+    def test_get_session_info(self):
+        self.client.get_session_info()
+        self.assert_called_with_positional("GET", "sessioninfo")
+
+    def test_get_users(self):
+        self.client.get_users()
+        self.assert_called_with_positional("GET", "users")
+
+    def test_get_user_profile(self):
+        self.client.get_user_profile(11)
+        self.assert_called_with_positional("GET", "users/profiles/11")
+
+    def test_send_one_time_pass(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            self.client.send_one_time_pass()
+        self.assert_called_with_positional("GET", "users/otp")
+
+
+class WriteBodyDelegationTests(unittest.TestCase):
+    """Regression tests for the body-forwarding fix.
+
+    These write methods historically passed the request body into ``request``'s
+    ``headers`` positional argument, so no JSON body was ever sent. They must
+    forward the body as keyword arguments (which ``request`` turns into the
+    JSON payload).
+    """
+
+    def setUp(self):
+        self.client = build_mock_client()
+        patcher = mock.patch.object(
+            self.client, "request", return_value={"status": 200, "content": {}}
+        )
+        self.mock_request = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def assert_body_forwarded(self, method, endpoint, **body):
+        self.mock_request.assert_called_once()
+        args, kwargs = self.mock_request.call_args
+        self.assertEqual(args[0], method)
+        self.assertEqual(args[1], endpoint)
+        # The body must arrive as the JSON payload, not as a positional
+        # (headers) argument.
+        self.assertEqual(len(args), 2)
+        self.assertEqual(kwargs, {"json": body})
+
+    def test_update_company_sends_body(self):
+        self.client.update_company(name="Acme Oy")
+        self.assert_body_forwarded("PUT", "company", name="Acme Oy")
+
+    def test_update_user_sends_body(self):
+        self.client.update_user(firstName="Jane")
+        self.assert_body_forwarded("PUT", "users", firstName="Jane")
+
+    def test_update_business_partner_sends_body(self):
+        self.client.update_business_partner(42, name="Acme Oy")
+        self.assert_body_forwarded("PUT", "businesspartners/42", name="Acme Oy")
+
+    def test_update_dimension_sends_body(self):
+        self.client.update_dimension(1, name="Cost center")
+        self.assert_body_forwarded("PUT", "dimensions/1", name="Cost center")
+
+    def test_create_dimension_item_sends_body(self):
+        self.client.create_dimension_item(1, name="Item")
+        self.assert_body_forwarded("POST", "dimensions/1/items", name="Item")
+
+    def test_update_dimension_item_sends_body(self):
+        self.client.update_dimension_item(1, name="Item")
+        self.assert_body_forwarded("PUT", "dimensions/1/items", name="Item")
+
+    def test_post_payment_sends_body(self):
+        self.client.post_payment(payments=[{"id": 1}])
+        self.assert_body_forwarded("POST", "payments", payments=[{"id": 1}])
+
+    def test_payments_direct_bank_transfers_sends_body(self):
+        self.client.payments_direct_bank_transfers(transfers=[{"id": 1}])
+        self.assert_body_forwarded(
+            "POST", "payments/directbanktransfers", transfers=[{"id": 1}]
+        )
+
+
+class DateParameterTests(unittest.TestCase):
+    """Date-only parameters accept strings as well as date/datetime objects."""
+
+    def setUp(self):
+        self.client = build_mock_client()
+        patcher = mock.patch.object(
+            self.client, "request", return_value={"status": 200, "content": {}}
+        )
+        self.mock_request = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _endpoint(self):
+        args, _ = self.mock_request.call_args
+        return args[1]
+
+    def test_string_dates_are_passed_through(self):
+        self.client.get_bank_statements("2024-01-01", "2024-01-31")
+        self.assertEqual(
+            self._endpoint(),
+            "bankstatements?startDate=2024-01-01&endDate=2024-01-31",
+        )
+
+    def test_date_objects_are_formatted(self):
+        from datetime import date
+
+        self.client.get_bank_statements(date(2024, 1, 1), date(2024, 1, 31))
+        self.assertEqual(
+            self._endpoint(),
+            "bankstatements?startDate=2024-01-01&endDate=2024-01-31",
+        )
+
+    def test_datetime_is_truncated_to_date(self):
+        from datetime import datetime
+
+        self.client.get_bank_statements(
+            datetime(2024, 1, 1, 13, 30, 0), datetime(2024, 1, 31, 9, 0, 0)
+        )
+        self.assertEqual(
+            self._endpoint(),
+            "bankstatements?startDate=2024-01-01&endDate=2024-01-31",
+        )
+
+
+class DeprecatedMethodTests(unittest.TestCase):
+    """Methods that target endpoints removed from the current Procountor API."""
+
+    def setUp(self):
+        self.client = build_mock_client()
+        patcher = mock.patch.object(
+            self.client, "request", return_value={"status": 200, "content": {}}
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_pay_invoice_warns(self):
+        with self.assertWarns(DeprecationWarning):
+            self.client.pay_invoice(invoiceIds=[1])
+
+    def test_send_one_time_pass_warns(self):
+        with self.assertWarns(DeprecationWarning):
+            self.client.send_one_time_pass()
+
+
+if __name__ == "__main__":
+    unittest.main()

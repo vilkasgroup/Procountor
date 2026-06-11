@@ -15,7 +15,7 @@ class TestClientBankAccounts(TestClient):
 
     def test_100_error_if_page_size_under_one(self):
       """
-      Error because page size cannot be under 1 
+      Error because page size cannot be under 1
       """
 
       response = self.client.get_bank_accounts(size=0)
